@@ -1,31 +1,91 @@
+/*
+==================================================
+ESTILOS DEL CHAT IA
+==================================================
+
+Este archivo controla:
+
+1. Colores
+2. Tipografía
+3. Diseño visual
+4. Tamaños y posiciones
+*/
+
+/* Estilo general de la página */
 body{
+
+    /* Fondo negro */
     background:black;
+
+    /* Texto blanco */
     color:white;
+
+    /* Fuente principal */
     font-family:Arial;
+
+    /* Centrar contenido */
     text-align:center;
 }
 
+
+/* Caja principal del chat */
 #chat{
+
+    /* Ancho del contenedor */
     width:80%;
+
+    /* Altura fija */
     height:300px;
+
+    /* Borde blanco */
     border:1px solid white;
+
+    /* Centrar automáticamente */
     margin:auto;
+
+    /* Separación inferior */
     margin-bottom:20px;
+
+    /* Espaciado interno */
     padding:10px;
+
+    /* Scroll vertical automático */
     overflow-y:auto;
+
+    /* Texto alineado a la izquierda */
     text-align:left;
 }
 
+
+/* Caja de texto del usuario */
 input{
+
+    /* Espaciado interno */
     padding:10px;
+
+    /* Ancho */
     width:250px;
+
+    /* Sin borde */
     border:none;
+
+    /* Bordes redondeados */
     border-radius:10px;
 }
 
+
+/* Botón enviar */
 button{
+
+    /* Espaciado interno */
     padding:10px;
+
+    /* Sin borde */
     border:none;
+
+    /* Bordes redondeados */
     border-radius:10px;
+
+    /* Cursor tipo botón */
     cursor:pointer;
 }
