@@ -1,10 +1,15 @@
 <!DOCTYPE html>
+
 <!--
 ========================================================
     IA CHAT LOCAL 🤖
-    Frontend sencillo para conectar con Flask + Ollama
-    Hecho para sobrevivir en laptops que ya escuchan voces
-    cuando abres Chrome + VSCode + IA al mismo tiempo 🔥
+    Chat simple con Flask + Ollama
+
+    ES:
+    Interfaz sencilla para hablar con una IA local.
+
+    EN:
+    Simple interface to chat with a local AI.
 ========================================================
 -->
 
@@ -12,56 +17,50 @@
 
 <head>
 
-    <!-- CONFIGURACIÓN BÁSICA -->
+    <!-- CONFIGURACIÓN / CONFIG -->
     <meta charset="UTF-8">
-
-    <!-- RESPONSIVE -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!-- TÍTULO -->
     <title>IA Chat</title>
 
     <style>
 
-        /* ========================================================
-            RESET GENERAL
-        ======================================================== */
+        /* =====================================================
+            ESTILOS GENERALES
+            GENERAL STYLES
+        ===================================================== */
 
         *{
             margin:0;
             padding:0;
             box-sizing:border-box;
-            font-family: Arial, Helvetica, sans-serif;
+            font-family:Arial;
         }
-
-        /* ========================================================
-            BODY PRINCIPAL
-        ======================================================== */
 
         body{
 
-            /* Fondo oscuro estilo ChatGPT */
             background:#0f0f0f;
 
-            /* Texto blanco */
             color:white;
 
-            /* Altura completa */
             height:100vh;
 
-            /* Centrado */
             display:flex;
+
             justify-content:center;
+
             align-items:center;
         }
 
-        /* ========================================================
-            CONTENEDOR PRINCIPAL DEL CHAT
-        ======================================================== */
+        /* =====================================================
+            CONTENEDOR PRINCIPAL
+            MAIN CONTAINER
+        ===================================================== */
 
-        .chat-container{
+        .chat{
 
             width:90%;
+
             max-width:900px;
 
             height:90vh;
@@ -71,18 +70,15 @@
             border-radius:20px;
 
             display:flex;
+
             flex-direction:column;
 
             overflow:hidden;
-
-            border:1px solid #2d2d2d;
-
-            box-shadow:0 0 25px rgba(0,0,0,0.5);
         }
 
-        /* ========================================================
+        /* =====================================================
             HEADER
-        ======================================================== */
+        ===================================================== */
 
         .header{
 
@@ -90,18 +86,17 @@
 
             background:#202020;
 
-            border-bottom:1px solid #2d2d2d;
-
             font-size:22px;
 
             font-weight:bold;
         }
 
-        /* ========================================================
-            CAJA DONDE APARECEN LOS MENSAJES
-        ======================================================== */
+        /* =====================================================
+            CAJA DE MENSAJES
+            MESSAGE BOX
+        ===================================================== */
 
-        .chat-box{
+        .messages{
 
             flex:1;
 
@@ -116,84 +111,60 @@
             gap:15px;
         }
 
-        /* ========================================================
-            MENSAJES GENERALES
-        ======================================================== */
+        /* =====================================================
+            MENSAJES
+            MESSAGES
+        ===================================================== */
 
-        .message{
+        .msg{
 
             max-width:75%;
 
             padding:15px;
 
-            border-radius:18px;
+            border-radius:15px;
 
             line-height:1.5;
-
-            word-wrap:break-word;
-
-            animation:fade .2s ease;
         }
 
-        /* ========================================================
-            MENSAJE DEL USUARIO
-        ======================================================== */
+        /* USUARIO / USER */
 
         .user{
 
             align-self:flex-end;
 
             background:#2563eb;
-
-            border-bottom-right-radius:5px;
         }
 
-        /* ========================================================
-            MENSAJE DE LA IA
-        ======================================================== */
+        /* IA / AI */
 
         .bot{
 
             align-self:flex-start;
 
             background:#2a2a2a;
-
-            border-bottom-left-radius:5px;
         }
 
-        /* ========================================================
-            EFECTO "PENSANDO..."
-        ======================================================== */
-
-        .typing{
-
-            opacity:.7;
-
-            font-style:italic;
-        }
-
-        /* ========================================================
-            ZONA DEL INPUT
-        ======================================================== */
+        /* =====================================================
+            INPUT AREA
+        ===================================================== */
 
         .input-area{
 
             display:flex;
 
+            gap:10px;
+
             padding:15px;
 
             background:#202020;
-
-            border-top:1px solid #2d2d2d;
-
-            gap:10px;
         }
 
-        /* ========================================================
-            INPUT
-        ======================================================== */
+        /* =====================================================
+            TEXTAREA
+        ===================================================== */
 
-        input{
+        textarea{
 
             flex:1;
 
@@ -202,6 +173,8 @@
             border:none;
 
             outline:none;
+
+            resize:none;
 
             border-radius:12px;
 
@@ -212,13 +185,14 @@
             font-size:16px;
         }
 
-        /* ========================================================
+        /* =====================================================
             BOTÓN
-        ======================================================== */
+            BUTTON
+        ===================================================== */
 
         button{
 
-            padding:15px 22px;
+            padding:15px 20px;
 
             border:none;
 
@@ -228,53 +202,12 @@
 
             color:white;
 
-            font-size:16px;
-
             cursor:pointer;
-
-            transition:.2s;
         }
 
         button:hover{
 
             background:#1d4ed8;
-        }
-
-        /* ========================================================
-            SCROLLBAR PERSONALIZADA
-        ======================================================== */
-
-        ::-webkit-scrollbar{
-
-            width:8px;
-        }
-
-        ::-webkit-scrollbar-thumb{
-
-            background:#333;
-
-            border-radius:10px;
-        }
-
-        /* ========================================================
-            ANIMACIÓN DE MENSAJES
-        ======================================================== */
-
-        @keyframes fade{
-
-            from{
-
-                opacity:0;
-
-                transform:translateY(10px);
-            }
-
-            to{
-
-                opacity:1;
-
-                transform:translateY(0);
-            }
         }
 
     </style>
@@ -283,11 +216,11 @@
 
 <body>
 
-    <!-- ========================================================
-            CONTENEDOR DEL CHAT
-    ========================================================= -->
+    <!-- =====================================================
+        CHAT
+    ===================================================== -->
 
-    <div class="chat-container">
+    <div class="chat">
 
         <!-- HEADER -->
         <div class="header">
@@ -296,30 +229,27 @@
 
         </div>
 
-        <!-- CAJA DE MENSAJES -->
-        <div class="chat-box" id="chatBox">
+        <!-- MENSAJES -->
+        <div class="messages" id="chatBox">
 
-            <!-- MENSAJE INICIAL -->
-            <div class="message bot">
+            <div class="msg bot">
 
-                Hola. Soy una IA local corriendo en una laptop
-                sufriendo térmicamente 🔥
+                Hola. Soy una IA local sobreviviendo
+                dentro de una laptop. 🔥
 
             </div>
 
         </div>
 
-        <!-- ÁREA DE ESCRITURA -->
+        <!-- INPUT -->
         <div class="input-area">
 
-            <!-- INPUT -->
-            <input 
-                type="text"
+            <textarea
                 id="mensaje"
+                rows="1"
                 placeholder="Escribe algo..."
-            >
+            ></textarea>
 
-            <!-- BOTÓN -->
             <button onclick="enviarMensaje()">
 
                 Enviar
@@ -332,113 +262,111 @@
 
 <script>
 
-/* ============================================================
-    FUNCIÓN PRINCIPAL
-    ENVÍA MENSAJES AL BACKEND (FLASK)
-============================================================ */
+/* =========================================================
+    ENVIAR MENSAJE
+    SEND MESSAGE
+========================================================= */
 
 async function enviarMensaje(){
 
-    // OBTENER INPUT
+    // INPUT
     let input = document.getElementById("mensaje");
 
-    // OBTENER TEXTO
+    // TEXTO
     let mensaje = input.value.trim();
 
-    // SI ESTÁ VACÍO NO HACER NADA
+    // SI ESTÁ VACÍO
+    // IF EMPTY
     if(mensaje === "") return;
 
-    // OBTENER CHATBOX
+    // CHATBOX
     let chatBox = document.getElementById("chatBox");
 
-    /* ========================================================
-        CREAR MENSAJE DEL USUARIO
-    ======================================================== */
+    /* =====================================================
+        MENSAJE USUARIO
+        USER MESSAGE
+    ===================================================== */
 
-    let userDiv = document.createElement("div");
+    let userMsg = document.createElement("div");
 
-    userDiv.className = "message user";
+    userMsg.className = "msg user";
 
-    userDiv.innerText = mensaje;
+    userMsg.innerText = mensaje;
 
-    // AGREGAR MENSAJE
-    chatBox.appendChild(userDiv);
+    chatBox.appendChild(userMsg);
 
-    /* ========================================================
-        LIMPIAR INPUT
-    ======================================================== */
-
+    // LIMPIAR INPUT
+    // CLEAR INPUT
     input.value = "";
 
-    /* ========================================================
-        HACER SCROLL AUTOMÁTICO
-    ======================================================== */
+    /* =====================================================
+        MENSAJE TEMPORAL IA
+        TEMP AI MESSAGE
+    ===================================================== */
 
+    let botMsg = document.createElement("div");
+
+    botMsg.className = "msg bot";
+
+    botMsg.innerText = "Pensando...";
+
+    chatBox.appendChild(botMsg);
+
+    // SCROLL ABAJO
     chatBox.scrollTop = chatBox.scrollHeight;
 
-    /* ========================================================
-        MENSAJE TEMPORAL "PENSANDO..."
-    ======================================================== */
+    /* =====================================================
+        FETCH A FLASK
+    ===================================================== */
 
-    let botDiv = document.createElement("div");
+    try{
 
-    botDiv.className = "message bot typing";
+        let respuesta = await fetch("/chat", {
 
-    botDiv.innerText = "Pensando...";
+            method:"POST",
 
-    // AGREGAR MENSAJE
-    chatBox.appendChild(botDiv);
+            headers:{
+                "Content-Type":"application/x-www-form-urlencoded"
+            },
 
-    // SCROLL
-    chatBox.scrollTop = chatBox.scrollHeight;
+            body:"mensaje=" + encodeURIComponent(mensaje)
 
-    /* ========================================================
-        PETICIÓN AL BACKEND
-        FETCH HACIA FLASK
-    ======================================================== */
+        });
 
-    let respuesta = await fetch("/chat", {
+        // RESPUESTA IA
+        // AI RESPONSE
+        let texto = await respuesta.text();
 
-        method:"POST",
+        // MOSTRAR RESPUESTA
+        // SHOW RESPONSE
+        botMsg.innerText = texto;
 
-        headers:{
-            "Content-Type":"application/x-www-form-urlencoded"
-        },
+    }
 
-        body:"mensaje=" + encodeURIComponent(mensaje)
+    catch(error){
 
-    });
+        // ERROR
+        botMsg.innerText = "Error conectando con la IA.";
 
-    /* ========================================================
-        OBTENER RESPUESTA DE LA IA
-    ======================================================== */
+    }
 
-    let texto = await respuesta.text();
-
-    /* ========================================================
-        REEMPLAZAR "PENSANDO..."
-    ======================================================== */
-
-    botDiv.classList.remove("typing");
-
-    botDiv.innerText = texto;
-
-    /* ========================================================
-        SCROLL FINAL
-    ======================================================== */
-
+    // SCROLL FINAL
     chatBox.scrollTop = chatBox.scrollHeight;
 }
 
-/* ============================================================
-    ENTER PARA ENVIAR MENSAJES
-============================================================ */
+/* =========================================================
+    ENTER PARA ENVIAR
+    ENTER TO SEND
+========================================================= */
 
 document.getElementById("mensaje")
-.addEventListener("keypress", function(event){
+.addEventListener("keydown", function(event){
 
-    // SI PRESIONA ENTER
-    if(event.key === "Enter"){
+    // ENTER SIN SHIFT
+    // ENTER WITHOUT SHIFT
+    if(event.key === "Enter" && !event.shiftKey){
+
+        event.preventDefault();
 
         enviarMensaje();
     }

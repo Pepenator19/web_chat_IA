@@ -1,91 +1,143 @@
 /*
 ==================================================
-ESTILOS DEL CHAT IA
+    IA CHAT - ESTILOS PRINCIPALES
+    IA CHAT - MAIN STYLES
 ==================================================
 
-Este archivo controla:
+ES:
+Este archivo controla la apariencia visual
+del chat IA.
 
-1. Colores
-2. Tipografía
-3. Diseño visual
-4. Tamaños y posiciones
+EN:
+This file controls the visual appearance
+of the AI chat.
 */
 
-/* Estilo general de la página */
+
+/* ==============================================
+    ESTILO GENERAL
+    GENERAL PAGE STYLE
+============================================== */
+
 body{
 
-    /* Fondo negro */
+    /* ES: Fondo negro
+       EN: Black background */
     background:black;
 
-    /* Texto blanco */
+    /* ES: Texto blanco
+       EN: White text */
     color:white;
 
-    /* Fuente principal */
-    font-family:Arial;
+    /* ES: Fuente principal
+       EN: Main font */
+    font-family:Arial, sans-serif;
 
-    /* Centrar contenido */
+    /* ES: Centrar contenido
+       EN: Center content */
     text-align:center;
 }
 
 
-/* Caja principal del chat */
+/* ==============================================
+    CONTENEDOR DEL CHAT
+    CHAT CONTAINER
+============================================== */
+
 #chat{
 
-    /* Ancho del contenedor */
+    /* ES: Ancho del chat
+       EN: Chat width */
     width:80%;
 
-    /* Altura fija */
+    /* ES: Altura fija
+       EN: Fixed height */
     height:300px;
 
-    /* Borde blanco */
+    /* ES: Borde blanco
+       EN: White border */
     border:1px solid white;
 
-    /* Centrar automáticamente */
+    /* ES: Centrar automáticamente
+       EN: Auto center */
     margin:auto;
 
-    /* Separación inferior */
+    /* ES: Espacio inferior
+       EN: Bottom spacing */
     margin-bottom:20px;
 
-    /* Espaciado interno */
+    /* ES: Espaciado interno
+       EN: Internal spacing */
     padding:10px;
 
-    /* Scroll vertical automático */
+    /* ES: Scroll automático
+       EN: Automatic scroll */
     overflow-y:auto;
 
-    /* Texto alineado a la izquierda */
+    /* ES: Texto alineado izquierda
+       EN: Left aligned text */
     text-align:left;
 }
 
 
-/* Caja de texto del usuario */
+/* ==============================================
+    INPUT DEL USUARIO
+    USER INPUT
+============================================== */
+
 input{
 
-    /* Espaciado interno */
+    /* ES: Espaciado interno
+       EN: Internal spacing */
     padding:10px;
 
-    /* Ancho */
+    /* ES: Ancho del input
+       EN: Input width */
     width:250px;
 
-    /* Sin borde */
+    /* ES: Sin borde
+       EN: No border */
     border:none;
 
-    /* Bordes redondeados */
+    /* ES: Bordes redondeados
+       EN: Rounded corners */
     border-radius:10px;
 }
 
 
-/* Botón enviar */
+/* ==============================================
+    BOTÓN ENVIAR
+    SEND BUTTON
+============================================== */
+
 button{
 
-    /* Espaciado interno */
+    /* ES: Espaciado interno
+       EN: Internal spacing */
     padding:10px;
 
-    /* Sin borde */
+    /* ES: Sin borde
+       EN: No border */
     border:none;
 
-    /* Bordes redondeados */
+    /* ES: Bordes redondeados
+       EN: Rounded corners */
     border-radius:10px;
 
-    /* Cursor tipo botón */
+    /* ES: Cursor tipo botón
+       EN: Pointer cursor */
     cursor:pointer;
+}
+
+
+/* ==============================================
+    EFECTO HOVER
+    HOVER EFFECT
+============================================== */
+
+button:hover{
+
+    /* ES: Cambia color al pasar mouse
+       EN: Change color on hover */
+    opacity:0.8;
 }

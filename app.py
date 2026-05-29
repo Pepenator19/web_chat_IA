@@ -1,97 +1,189 @@
-"""
-==================================================
-CHAT IA LOCAL CON FLASK + OLLAMA
-==================================================
-
-Este programa:
-
-1. Crea un servidor web usando Flask
-2. Muestra la página HTML
-3. Recibe mensajes del usuario
-4. Envía mensajes al modelo IA local
-5. Devuelve respuestas al navegador
-
-Modelo usado:
-- phi3
-
-Tecnologías:
-- Python
-- Flask
-- Ollama
-- HTML
-- CSS
-- JavaScript
-"""
-
-# Importar Flask
 from flask import Flask, render_template, request
-
-# Importar Ollama
 import ollama
+import json
+import os
 
-
-# Crear aplicación Flask
 app = Flask(__name__)
 
+# =========================================
+# CARGAR PERSONALIDAD
+# =========================================
 
-# Ruta principal
+with open("prompts/personalidad.txt", "r", encoding="utf-8") as archivo:
+    personalidad = archivo.read()
+
+# =========================================
+# CARGAR MEMORIA
+# =========================================
+
+if os.path.exists("memoria.json"):
+
+    with open("memoria.json", "r", encoding="utf-8") as archivo:
+        historial = json.load(archivo)
+
+else:
+
+    historial = [
+        {
+            "role": "system",
+            "content": personalidad
+        }
+    ]
+
+# =========================================
+# CARGAR RECUERDOS
+# =========================================
+
+if os.path.exists("recuerdos.json"):
+
+    with open("recuerdos.json", "r", encoding="utf-8") as archivo:
+        recuerdos = json.load(archivo)
+
+else:
+
+    recuerdos = []
+
+# =========================================
+# PÁGINA PRINCIPAL
+# =========================================
+
 @app.route("/")
 def index():
-
-    """
-    Mostrar la página principal.
-    """
 
     return render_template("index.html")
 
 
-# Ruta del chat
+# =========================================
+# CHAT IA
+# =========================================
+
 @app.route("/chat", methods=["POST"])
 def chat():
 
-    """
-    Recibe mensaje del usuario,
-    lo envía a la IA y devuelve la respuesta.
-    """
+    global historial
+    global recuerdos
 
-    # Obtener mensaje enviado desde JavaScript
+    # Obtener mensaje
     mensaje = request.form["mensaje"]
 
+    # =====================================
+    # GUARDAR MENSAJE USUARIO
+    # =====================================
 
-    # Enviar conversación al modelo IA
+    historial.append({
+        "role": "user",
+        "content": mensaje
+    })
+
+    # =====================================
+    # CREAR CONTEXTO DE RECUERDOS
+    # =====================================
+
+    contexto_recuerdos = ""
+
+    if len(recuerdos) > 0:
+
+        contexto_recuerdos = (
+            "Recuerdos importantes del usuario:\n"
+            + "\n".join(recuerdos)
+        )
+
+    # =====================================
+    # MENSAJES PARA OLLAMA
+    # =====================================
+
+    mensajes_ia = [
+
+        {
+            "role": "system",
+            "content": personalidad
+        },
+
+        {
+            "role": "system",
+            "content": contexto_recuerdos
+        }
+
+    ] + historial[-15:]
+
+    # =====================================
+    # RESPUESTA IA
+    # =====================================
+
     respuesta = ollama.chat(
-
-        # Modelo utilizado
         model="phi3",
-
-        # Mensajes enviados al modelo
-        messages=[
-
-            # Personalidad de la IA
-            {
-                "role": "system",
-                "content": "Eres una IA útil, breve y algo sarcástica."
-            },
-
-            # Mensaje del usuario
-            {
-                "role": "user",
-                "content": mensaje
-            }
-        ]
+        messages=mensajes_ia
     )
 
-
-    # Extraer texto de respuesta
     texto = respuesta["message"]["content"]
 
+    # =====================================
+    # GUARDAR RESPUESTA IA
+    # =====================================
 
-    # Devolver texto al navegador
+    historial.append({
+        "role": "assistant",
+        "content": texto
+    })
+
+    # =====================================
+    # GUARDAR MEMORIA
+    # =====================================
+
+    with open("memoria.json", "w", encoding="utf-8") as archivo:
+
+        json.dump(
+            historial,
+            archivo,
+            ensure_ascii=False,
+            indent=4
+        )
+
+    # =====================================
+    # DETECTOR SIMPLE DE RECUERDOS
+    # =====================================
+
+    claves = [
+        "me llamo",
+        "tengo",
+        "me gusta",
+        "mi laptop",
+        "uso",
+        "soy"
+    ]
+
+    for clave in claves:
+
+        if clave in mensaje.lower():
+
+            recuerdos.append(mensaje)
+
+            with open(
+                "recuerdos.json",
+                "w",
+                encoding="utf-8"
+            ) as archivo:
+
+                json.dump(
+                    recuerdos,
+                    archivo,
+                    ensure_ascii=False,
+                    indent=4
+                )
+
+            break
+
+    # =====================================
+    # DEVOLVER RESPUESTA
+    # =====================================
+
     return texto
 
 
-# Ejecutar servidor Flask
+# =========================================
+# INICIAR SERVIDOR
+# =========================================
+
 if __name__ == "__main__":
 
-    # Activar modo debug
     app.run(debug=True)
