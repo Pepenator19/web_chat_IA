@@ -19,7 +19,7 @@ https://ollama.com
 
 Después instala un modelo, por ejemplo:
 
-ollama pull llama3
+ollama pull phi3
 
 
 ---
@@ -119,7 +119,7 @@ https://ollama.com
 
 Then install a model, for example:
 
-ollama pull llama3
+ollama pull phi3
 
 
 ---
