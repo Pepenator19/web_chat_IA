@@ -28,7 +28,7 @@ Instalación
 
 Clona el repositorio:
 
-git clone https://github.com/TU-USUARIO/TU-REPOSITORIO.git
+git clone https://github.com/Pepenator19/web_chat_IA.git
 
 Entra a la carpeta:
 
@@ -128,7 +128,7 @@ Installation
 
 Clone the repository:
 
-git clone https://github.com/YOUR-USERNAME/YOUR-REPOSITORY.git
+git clone https://github.com/Pepenator19/web_chat_IA
 
 Enter the project folder:
 
