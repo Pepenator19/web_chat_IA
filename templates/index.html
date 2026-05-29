@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IA Chat</title>
+
+    <style>
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        body{
+            background:#0f0f0f;
+            color:white;
+            height:100vh;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+        }
+
+        .chat-container{
+            width:90%;
+            max-width:900px;
+            height:90vh;
+            background:#181818;
+            border-radius:20px;
+            display:flex;
+            flex-direction:column;
+            overflow:hidden;
+            border:1px solid #2d2d2d;
+            box-shadow:0 0 25px rgba(0,0,0,0.5);
+        }
+
+        .header{
+            padding:20px;
+            background:#202020;
+            border-bottom:1px solid #2d2d2d;
+            font-size:22px;
+            font-weight:bold;
+        }
+
+        .chat-box{
+            flex:1;
+            padding:20px;
+            overflow-y:auto;
+            display:flex;
+            flex-direction:column;
+            gap:15px;
+        }
+
+        .message{
+            max-width:75%;
+            padding:15px;
+            border-radius:18px;
+            line-height:1.5;
+            word-wrap:break-word;
+            animation:fade .2s ease;
+        }
+
+        .user{
+            align-self:flex-end;
+            background:#2563eb;
+            border-bottom-right-radius:5px;
+        }
+
+        .bot{
+            align-self:flex-start;
+            background:#2a2a2a;
+            border-bottom-left-radius:5px;
+        }
+
+        .typing{
+            opacity:.7;
+            font-style:italic;
+        }
+
+        .input-area{
+            display:flex;
+            padding:15px;
+            background:#202020;
+            border-top:1px solid #2d2d2d;
+            gap:10px;
+        }
+
+        input{
+            flex:1;
+            padding:15px;
+            border:none;
+            outline:none;
+            border-radius:12px;
+            background:#2b2b2b;
+            color:white;
+            font-size:16px;
+        }
+
+        button{
+            padding:15px 22px;
+            border:none;
+            border-radius:12px;
+            background:#2563eb;
+            color:white;
+            font-size:16px;
+            cursor:pointer;
+            transition:.2s;
+        }
+
+        button:hover{
+            background:#1d4ed8;
+        }
+
+        ::-webkit-scrollbar{
+            width:8px;
+        }
+
+        ::-webkit-scrollbar-thumb{
+            background:#333;
+            border-radius:10px;
+        }
+
+        @keyframes fade{
+            from{
+                opacity:0;
+                transform:translateY(10px);
+            }
+            to{
+                opacity:1;
+                transform:translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="chat-container">
+
+        <div class="header">
+            IA Local 🤖
+        </div>
+
+        <div class="chat-box" id="chatBox">
+
+            <div class="message bot">
+                Hola. Soy una IA local corriendo en una laptop sufriendo térmicamente 🔥
+            </div>
+
+        </div>
+
+        <div class="input-area">
+
+            <input 
+                type="text" 
+                id="mensaje" 
+                placeholder="Escribe algo..."
+            >
+
+            <button onclick="enviarMensaje()">
+                Enviar
+            </button>
+
+        </div>
+
+    </div>
+
+<script>
+
+async function enviarMensaje(){
+
+    let input = document.getElementById("mensaje");
+    let mensaje = input.value.trim();
+
+    if(mensaje === "") return;
+
+    let chatBox = document.getElementById("chatBox");
+
+    // MENSAJE USUARIO
+    let userDiv = document.createElement("div");
+    userDiv.className = "message user";
+    userDiv.innerText = mensaje;
+
+    chatBox.appendChild(userDiv);
+
+    // LIMPIAR INPUT
+    input.value = "";
+
+    // SCROLL
+    chatBox.scrollTop = chatBox.scrollHeight;
+
+    // MENSAJE "PENSANDO"
+    let botDiv = document.createElement("div");
+    botDiv.className = "message bot typing";
+    botDiv.innerText = "Pensando...";
+
+    chatBox.appendChild(botDiv);
+
+    chatBox.scrollTop = chatBox.scrollHeight;
+
+    // ENVIAR A FLASK
+    let respuesta = await fetch("/chat", {
+        method:"POST",
+        headers:{
+            "Content-Type":"application/x-www-form-urlencoded"
+        },
+        body:"mensaje=" + encodeURIComponent(mensaje)
+    });
+
+    let texto = await respuesta.text();
+
+    // CAMBIAR "PENSANDO"
+    botDiv.classList.remove("typing");
+    botDiv.innerText = texto;
+
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+// ENTER PARA ENVIAR
+document.getElementById("mensaje")
+.addEventListener("keypress", function(event){
+
+    if(event.key === "Enter"){
+        enviarMensaje();
+    }
+
+});
+
+</script>
+
+</body>
+</html>
