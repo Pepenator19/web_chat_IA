@@ -1,222 +1,286 @@
-# web_chat_ia
-primer proyecto
-🇲🇽 Instrucciones en Español
+# web_chat_IA
 
-Requisitos
+A small local AI chat project built with Flask and Ollama.
 
-Antes de ejecutar el proyecto necesitas tener instalado:
+The goal is to build a simple local-first assistant that is easy to inspect, modify, and understand. It runs on your own machine, uses a local Ollama model, and stores memory in local JSON files.
 
-Python 3.10 o superior
+## Features
 
-Git
+- Local Ollama model support
+- Flask backend
+- Separate HTML, CSS, and JavaScript frontend
+- Personality prompt loaded from a text file
+- Persistent chat history stored in JSON
+- Separate user memories stored in JSON
+- Private memory files ignored by Git
+- Example JSON memory files included for reference
+- No external APIs required
 
-Ollama
+## Project Structure
 
+```plaintext
+web_chat_IA/
++-- app.py
++-- prompts/
+|   +-- personalidad.txt
++-- static/
+|   +-- script.js
+|   +-- style.css
++-- templates/
+|   +-- index.html
++-- data/
+|   +-- memoria.json
+|   +-- recuerdos.json
+|   +-- example_memory.json
+|   +-- example_recuerdos.json
++-- requirements.txt
++-- requirements_full.txt
++-- .gitignore
++-- README.md
+```
 
-Descargar Ollama
+## Requirements
 
+Before running the project, install:
+
+- Python 3.10 or higher
+- Git
+- Ollama
+
+Download Ollama:
+
+```bash
 https://ollama.com
+```
 
-Después instala un modelo, por ejemplo:
+Install a local model, for example:
 
+```bash
 ollama pull phi3
+```
 
-
----
-
-Instalación
-
-Clona el repositorio:
-
-git clone https://github.com/Pepenator19/web_chat_IA.git
-
-Entra a la carpeta:
-
-cd TU-REPOSITORIO
-
-Crea un entorno virtual:
-
-python -m venv venv
-
-Activa el entorno virtual:
-
-Windows
-
-venv\Scripts\activate
-
-Linux / Mac
-
-source venv/bin/activate
-
-Instala las dependencias:
-
-pip install -r requirements.txt
-
-
----
-
-Ejecutar el proyecto
-
-Primero asegúrate de que Ollama esté abierto y funcionando.
-
-Luego ejecuta:
-
-python app.py
-
-o:
-
-python main.py
-
-
----
-
-Importante ⚠️
-
-Este proyecto:
-
-Usa Ollama
-
-Funciona completamente en local
-
-NO usa APIs externas
-
-NO envía información a servidores
-
-Requiere tener un modelo descargado en Ollama
-
-
-Todo se procesa directamente en tu computadora.
-
-
----
-
-Archivos ignorados en Git
-
-__pycache__/
-*.pyc
-venv/
-.env
-data/*.json
-
-Los archivos reales de memoria viven en:
-
-data/memoria.json
-data/recuerdos.json
-
-Git ignora esos datos privados. Para mostrar el formato sin subir recuerdos reales, usa:
-
-data/example_memory.json
-data/example_recuerdos.json
-
-
----
-
-🇺🇸 English Instructions
-
-Requirements
-
-Before running the project, make sure you have installed:
-
-Python 3.10 or higher
-
-Git
-
-Ollama
-
-
-Download Ollama
-
-https://ollama.com
-
-Then install a model, for example:
-
-ollama pull phi3
-
-
----
-
-Installation
+## Installation
 
 Clone the repository:
 
-git clone https://github.com/Pepenator19/web_chat_IA
+```bash
+git clone https://github.com/Pepenator19/web_chat_IA.git
+```
 
 Enter the project folder:
 
-cd YOUR-REPOSITORY
+```bash
+cd web_chat_IA
+```
 
 Create a virtual environment:
 
+```bash
 python -m venv venv
+```
 
 Activate the virtual environment:
 
-Windows
+Windows:
 
+```bash
 venv\Scripts\activate
+```
 
-Linux / Mac
+Linux / macOS:
 
+```bash
 source venv/bin/activate
+```
 
 Install dependencies:
 
+```bash
 pip install -r requirements.txt
+```
 
+## Run The Project
 
----
+Make sure Ollama is running, then start the app:
 
-Run the Project
-
-First, make sure Ollama is running.
-
-Then execute:
-
+```bash
 python app.py
+```
 
-or:
+Open the local address shown in your terminal, usually:
 
-python main.py
+```bash
+http://127.0.0.1:5000
+```
 
+## Local Memory
 
----
+The project stores memory locally using JSON files:
 
-Important ⚠️
+```plaintext
+data/memoria.json
+data/recuerdos.json
+```
+
+- `memoria.json` stores the chat history.
+- `recuerdos.json` stores important user memories.
+
+These files are private and are ignored by Git.
+
+Example files are included so other people can understand the format without exposing real personal data:
+
+```plaintext
+data/example_memory.json
+data/example_recuerdos.json
+```
+
+## Privacy
 
 This project:
 
-Uses Ollama
+- Runs locally with Ollama
+- Does not use external APIs
+- Does not send chat data to cloud services
+- Stores memory on your own machine
+- Keeps real memory files out of Git
 
-Runs completely locally
+## Git Ignored Files
 
-Does NOT use external APIs
+The `.gitignore` file ignores local environments, Python cache files, and private memory files:
 
-Does NOT send data to servers
-
-Requires a downloaded Ollama model
-
-
-Everything runs directly on your own machine.
-
-
----
-
-Git Ignored Files
-
+```gitignore
 __pycache__/
 *.pyc
 venv/
 .env
 data/*.json
+!data/example_memory.json
+!data/example_recuerdos.json
+```
 
-Real memory files live in:
+## Español
 
+Proyecto pequeño de chat con IA local construido con Flask y Ollama.
+
+La idea es crear un asistente local simple, fácil de revisar, modificar y entender. Todo corre en tu propia computadora, usa un modelo local de Ollama y guarda la memoria en archivos JSON locales.
+
+## Características
+
+- Soporte para modelos locales de Ollama
+- Backend con Flask
+- Frontend separado con HTML, CSS y JavaScript
+- Personalidad cargada desde un archivo de texto
+- Historial persistente guardado en JSON
+- Recuerdos del usuario guardados por separado en JSON
+- Archivos privados de memoria ignorados por Git
+- Archivos JSON de ejemplo incluidos como referencia
+- No requiere APIs externas
+
+## Requisitos
+
+Antes de ejecutar el proyecto necesitas:
+
+- Python 3.10 o superior
+- Git
+- Ollama
+
+Descarga Ollama:
+
+```bash
+https://ollama.com
+```
+
+Instala un modelo local, por ejemplo:
+
+```bash
+ollama pull phi3
+```
+
+## Instalación
+
+Clona el repositorio:
+
+```bash
+git clone https://github.com/Pepenator19/web_chat_IA.git
+```
+
+Entra a la carpeta:
+
+```bash
+cd web_chat_IA
+```
+
+Crea un entorno virtual:
+
+```bash
+python -m venv venv
+```
+
+Activa el entorno virtual:
+
+Windows:
+
+```bash
+venv\Scripts\activate
+```
+
+Linux / macOS:
+
+```bash
+source venv/bin/activate
+```
+
+Instala las dependencias:
+
+```bash
+pip install -r requirements.txt
+```
+
+## Ejecutar El Proyecto
+
+Asegúrate de que Ollama esté abierto y funcionando. Después ejecuta:
+
+```bash
+python app.py
+```
+
+Abre la dirección local que aparece en la terminal, normalmente:
+
+```bash
+http://127.0.0.1:5000
+```
+
+## Memoria Local
+
+El proyecto guarda la memoria localmente usando archivos JSON:
+
+```plaintext
 data/memoria.json
 data/recuerdos.json
+```
 
-Git ignores those private files. To show the format without uploading real memories, use:
+- `memoria.json` guarda el historial del chat.
+- `recuerdos.json` guarda recuerdos importantes del usuario.
 
+Estos archivos son privados y Git los ignora.
+
+También hay archivos de ejemplo para mostrar el formato sin subir datos personales reales:
+
+```plaintext
 data/example_memory.json
 data/example_recuerdos.json
+```
 
-Humans inventing virtual environments just to immediately hide them from Git. Peak software engineering theater. 💀
+## Privacidad
+
+Este proyecto:
+
+- Funciona localmente con Ollama
+- No usa APIs externas
+- No envía conversaciones a servicios en la nube
+- Guarda la memoria en tu propia computadora
+- Mantiene los archivos reales de memoria fuera de Git
+
+## Estado Del Proyecto
+
+Este proyecto está en desarrollo. La memoria actual usa JSON porque es simple, transparente y fácil de modificar. Más adelante se podrían agregar mejoras como mejor organización de recuerdos, búsqueda semántica, RAG o una interfaz más completa.
