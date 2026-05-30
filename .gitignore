@@ -2,3 +2,8 @@ __pycache__/
 *.pyc
 venv/
 .env
+
+# Memory files
+data/*.json
+!data/example_memory.json
+!data/example_recuerdos.json

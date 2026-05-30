@@ -1,24 +1,47 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, Response
 import ollama
 import json
 import os
 
 app = Flask(__name__)
 
-# =========================================
-# CARGAR PERSONALIDAD
-# =========================================
+DATA_DIR = "data"
+MEMORY_FILE = os.path.join(DATA_DIR, "memoria.json")
+USER_MEMORIES_FILE = os.path.join(DATA_DIR, "recuerdos.json")
+
+os.makedirs(DATA_DIR, exist_ok=True)
+
+# =========================================================
+# LOAD AI PERSONALITY
+# CARGAR PERSONALIDAD DE LA IA
+# =========================================================
+#
+# English:
+# Reads the AI personality from a text file.
+#
+# Español:
+# Lee la personalidad de la IA desde un archivo de texto.
+#
 
 with open("prompts/personalidad.txt", "r", encoding="utf-8") as archivo:
     personalidad = archivo.read()
 
-# =========================================
-# CARGAR MEMORIA
-# =========================================
 
-if os.path.exists("memoria.json"):
+# =========================================================
+# LOAD CHAT MEMORY
+# CARGAR MEMORIA DEL CHAT
+# =========================================================
+#
+# English:
+# Loads previous conversation history if it exists.
+#
+# Español:
+# Carga el historial anterior si existe.
+#
 
-    with open("memoria.json", "r", encoding="utf-8") as archivo:
+if os.path.exists(MEMORY_FILE):
+
+    with open(MEMORY_FILE, "r", encoding="utf-8") as archivo:
         historial = json.load(archivo)
 
 else:
@@ -30,22 +53,33 @@ else:
         }
     ]
 
-# =========================================
-# CARGAR RECUERDOS
-# =========================================
 
-if os.path.exists("recuerdos.json"):
+# =========================================================
+# LOAD USER MEMORIES
+# CARGAR RECUERDOS DEL USUARIO
+# =========================================================
+#
+# English:
+# Loads important remembered user information.
+#
+# Español:
+# Carga recuerdos importantes del usuario.
+#
 
-    with open("recuerdos.json", "r", encoding="utf-8") as archivo:
+if os.path.exists(USER_MEMORIES_FILE):
+
+    with open(USER_MEMORIES_FILE, "r", encoding="utf-8") as archivo:
         recuerdos = json.load(archivo)
 
 else:
 
     recuerdos = []
 
-# =========================================
+
+# =========================================================
+# MAIN PAGE
 # PÁGINA PRINCIPAL
-# =========================================
+# =========================================================
 
 @app.route("/")
 def index():
@@ -53,9 +87,10 @@ def index():
     return render_template("index.html")
 
 
-# =========================================
-# CHAT IA
-# =========================================
+# =========================================================
+# AI CHAT ROUTE
+# RUTA PRINCIPAL DEL CHAT
+# =========================================================
 
 @app.route("/chat", methods=["POST"])
 def chat():
@@ -63,34 +98,39 @@ def chat():
     global historial
     global recuerdos
 
-    # Obtener mensaje
+    # =====================================================
+    # GET USER MESSAGE
+    # OBTENER MENSAJE DEL USUARIO
+    # =====================================================
+
     mensaje = request.form["mensaje"]
 
-    # =====================================
-    # GUARDAR MENSAJE USUARIO
-    # =====================================
+    # Save user message
+    # Guardar mensaje del usuario
 
     historial.append({
         "role": "user",
         "content": mensaje
     })
 
-    # =====================================
+    # =====================================================
+    # CREATE MEMORY CONTEXT
     # CREAR CONTEXTO DE RECUERDOS
-    # =====================================
+    # =====================================================
 
     contexto_recuerdos = ""
 
     if len(recuerdos) > 0:
 
         contexto_recuerdos = (
-            "Recuerdos importantes del usuario:\n"
+            "Important user memories:\n"
             + "\n".join(recuerdos)
         )
 
-    # =====================================
-    # MENSAJES PARA OLLAMA
-    # =====================================
+    # =====================================================
+    # CREATE AI MESSAGE CONTEXT
+    # CREAR CONTEXTO PARA LA IA
+    # =====================================================
 
     mensajes_ia = [
 
@@ -106,42 +146,77 @@ def chat():
 
     ] + historial[-15:]
 
-    # =====================================
-    # RESPUESTA IA
-    # =====================================
+    # =====================================================
+    # STREAM RESPONSE FUNCTION
+    # FUNCIÓN DE RESPUESTA EN STREAMING
+    # =====================================================
 
-    respuesta = ollama.chat(
-        model="phi3",
-        messages=mensajes_ia
-    )
+    def generar_respuesta():
 
-    texto = respuesta["message"]["content"]
+        texto_completo = ""
 
-    # =====================================
-    # GUARDAR RESPUESTA IA
-    # =====================================
+        # ================================================
+        # OLLAMA STREAMING
+        # STREAMING CON OLLAMA
+        # ================================================
 
-    historial.append({
-        "role": "assistant",
-        "content": texto
-    })
+        respuesta = ollama.chat(
 
-    # =====================================
-    # GUARDAR MEMORIA
-    # =====================================
+            model="phi3",
 
-    with open("memoria.json", "w", encoding="utf-8") as archivo:
+            messages=mensajes_ia,
 
-        json.dump(
-            historial,
-            archivo,
-            ensure_ascii=False,
-            indent=4
+            stream=True
         )
 
-    # =====================================
+        # ================================================
+        # RECEIVE TOKENS IN REAL TIME
+        # RECIBIR TOKENS EN TIEMPO REAL
+        # ================================================
+
+        for chunk in respuesta:
+
+            contenido = chunk["message"]["content"]
+
+            texto_completo += contenido
+
+            # Send chunk to frontend
+            # Enviar fragmento al frontend
+
+            yield contenido
+
+        # ================================================
+        # SAVE AI RESPONSE
+        # GUARDAR RESPUESTA DE LA IA
+        # ================================================
+
+        historial.append({
+            "role": "assistant",
+            "content": texto_completo
+        })
+
+        # ================================================
+        # SAVE CHAT MEMORY
+        # GUARDAR MEMORIA DEL CHAT
+        # ================================================
+
+        with open(
+            MEMORY_FILE,
+            "w",
+            encoding="utf-8"
+        ) as archivo:
+
+            json.dump(
+                historial,
+                archivo,
+                ensure_ascii=False,
+                indent=4
+            )
+
+    # =====================================================
+    # SIMPLE MEMORY DETECTOR
     # DETECTOR SIMPLE DE RECUERDOS
-    # =====================================
+    # =====================================================
 
     claves = [
         "me llamo",
@@ -159,7 +234,7 @@ def chat():
             recuerdos.append(mensaje)
 
             with open(
-                "recuerdos.json",
+                USER_MEMORIES_FILE,
                 "w",
                 encoding="utf-8"
             ) as archivo:
@@ -173,16 +248,21 @@ def chat():
 
             break
 
-    # =====================================
-    # DEVOLVER RESPUESTA
-    # =====================================
+    # =====================================================
+    # RETURN STREAM RESPONSE
+    # DEVOLVER RESPUESTA EN STREAMING
+    # =====================================================
 
-    return texto
+    return Response(
+        generar_respuesta(),
+        content_type="text/plain"
+    )
 
 
-# =========================================
+# =========================================================
+# START SERVER
 # INICIAR SERVIDOR
-# =========================================
+# =========================================================
 
 if __name__ == "__main__":
 

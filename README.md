@@ -96,6 +96,17 @@ __pycache__/
 *.pyc
 venv/
 .env
+data/*.json
+
+Los archivos reales de memoria viven en:
+
+data/memoria.json
+data/recuerdos.json
+
+Git ignora esos datos privados. Para mostrar el formato sin subir recuerdos reales, usa:
+
+data/example_memory.json
+data/example_recuerdos.json
 
 
 ---
@@ -196,5 +207,16 @@ __pycache__/
 *.pyc
 venv/
 .env
+data/*.json
+
+Real memory files live in:
+
+data/memoria.json
+data/recuerdos.json
+
+Git ignores those private files. To show the format without uploading real memories, use:
+
+data/example_memory.json
+data/example_recuerdos.json
 
 Humans inventing virtual environments just to immediately hide them from Git. Peak software engineering theater. 💀

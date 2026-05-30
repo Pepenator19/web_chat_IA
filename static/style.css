@@ -1,143 +1,212 @@
-/*
-==================================================
-    IA CHAT - ESTILOS PRINCIPALES
-    IA CHAT - MAIN STYLES
-==================================================
+/* =========================================================
+   STYLE.CSS
+   Diseño simple, limpio y responsive
+   Simple, clean and responsive design
 
-ES:
-Este archivo controla la apariencia visual
-del chat IA.
+   Proyecto:
+   Web Chat IA Local con Ollama
+   Local AI Web Chat with Ollama
+========================================================= */
 
-EN:
-This file controls the visual appearance
-of the AI chat.
-*/
+/* ---------- RESET ---------- */
 
-
-/* ==============================================
-    ESTILO GENERAL
-    GENERAL PAGE STYLE
-============================================== */
-
-body{
-
-    /* ES: Fondo negro
-       EN: Black background */
-    background:black;
-
-    /* ES: Texto blanco
-       EN: White text */
-    color:white;
-
-    /* ES: Fuente principal
-       EN: Main font */
-    font-family:Arial, sans-serif;
-
-    /* ES: Centrar contenido
-       EN: Center content */
-    text-align:center;
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
+/* ---------- BODY ---------- */
 
-/* ==============================================
-    CONTENEDOR DEL CHAT
-    CHAT CONTAINER
-============================================== */
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: #111827;
+    color: white;
 
-#chat{
+    height: 100vh;
 
-    /* ES: Ancho del chat
-       EN: Chat width */
-    width:80%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 
-    /* ES: Altura fija
-       EN: Fixed height */
-    height:300px;
-
-    /* ES: Borde blanco
-       EN: White border */
-    border:1px solid white;
-
-    /* ES: Centrar automáticamente
-       EN: Auto center */
-    margin:auto;
-
-    /* ES: Espacio inferior
-       EN: Bottom spacing */
-    margin-bottom:20px;
-
-    /* ES: Espaciado interno
-       EN: Internal spacing */
-    padding:10px;
-
-    /* ES: Scroll automático
-       EN: Automatic scroll */
-    overflow-y:auto;
-
-    /* ES: Texto alineado izquierda
-       EN: Left aligned text */
-    text-align:left;
+    padding: 20px;
 }
 
+/* ---------- MAIN CONTAINER ---------- */
 
-/* ==============================================
-    INPUT DEL USUARIO
-    USER INPUT
-============================================== */
+.chat-container {
+    width: 100%;
+    max-width: 900px;
 
-input{
+    height: 90vh;
 
-    /* ES: Espaciado interno
-       EN: Internal spacing */
-    padding:10px;
+    background: #1f2937;
 
-    /* ES: Ancho del input
-       EN: Input width */
-    width:250px;
+    border-radius: 15px;
 
-    /* ES: Sin borde
-       EN: No border */
-    border:none;
+    display: flex;
+    flex-direction: column;
 
-    /* ES: Bordes redondeados
-       EN: Rounded corners */
-    border-radius:10px;
+    overflow: hidden;
+
+    box-shadow: 0 0 20px rgba(0,0,0,0.4);
 }
 
+/* ---------- HEADER ---------- */
 
-/* ==============================================
-    BOTÓN ENVIAR
-    SEND BUTTON
-============================================== */
+.chat-header {
+    background: #2563eb;
 
-button{
+    padding: 20px;
 
-    /* ES: Espaciado interno
-       EN: Internal spacing */
-    padding:10px;
+    text-align: center;
 
-    /* ES: Sin borde
-       EN: No border */
-    border:none;
-
-    /* ES: Bordes redondeados
-       EN: Rounded corners */
-    border-radius:10px;
-
-    /* ES: Cursor tipo botón
-       EN: Pointer cursor */
-    cursor:pointer;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
 }
 
+.chat-header h1 {
+    font-size: 1.8rem;
+}
 
-/* ==============================================
-    EFECTO HOVER
-    HOVER EFFECT
-============================================== */
+.chat-header p {
+    margin-top: 5px;
 
-button:hover{
+    font-size: 0.9rem;
 
-    /* ES: Cambia color al pasar mouse
-       EN: Change color on hover */
-    opacity:0.8;
+    opacity: 0.9;
+}
+
+/* ---------- CHAT BOX ---------- */
+
+.chat-box {
+    flex: 1;
+
+    padding: 20px;
+
+    overflow-y: auto;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 15px;
+}
+
+/* ---------- MESSAGE ---------- */
+
+.message {
+    max-width: 80%;
+
+    padding: 14px;
+
+    border-radius: 12px;
+
+    line-height: 1.5;
+
+    word-wrap: break-word;
+}
+
+/* ---------- USER MESSAGE ---------- */
+
+.user-message {
+    align-self: flex-end;
+
+    background: #2563eb;
+}
+
+/* ---------- AI MESSAGE ---------- */
+
+.ai-message {
+    align-self: flex-start;
+
+    background: #374151;
+}
+
+/* ---------- INPUT AREA ---------- */
+
+.chat-input {
+    display: flex;
+
+    gap: 10px;
+
+    padding: 15px;
+
+    background: #111827;
+
+    border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+/* ---------- INPUT ---------- */
+
+.chat-input input {
+    flex: 1;
+
+    padding: 14px;
+
+    border: none;
+
+    border-radius: 10px;
+
+    outline: none;
+
+    font-size: 1rem;
+
+    background: #1f2937;
+
+    color: white;
+}
+
+/* ---------- BUTTON ---------- */
+
+.chat-input button {
+    padding: 14px 20px;
+
+    border: none;
+
+    border-radius: 10px;
+
+    background: #2563eb;
+
+    color: white;
+
+    cursor: pointer;
+
+    transition: 0.2s;
+}
+
+/* ---------- BUTTON HOVER ---------- */
+
+.chat-input button:hover {
+    background: #1d4ed8;
+}
+
+/* ---------- SCROLLBAR ---------- */
+
+.chat-box::-webkit-scrollbar {
+    width: 8px;
+}
+
+.chat-box::-webkit-scrollbar-thumb {
+    background: #4b5563;
+
+    border-radius: 10px;
+}
+
+/* ---------- MOBILE ---------- */
+
+@media (max-width: 700px) {
+
+    .chat-container {
+        height: 100vh;
+
+        border-radius: 0;
+    }
+
+    .message {
+        max-width: 95%;
+    }
+
+    .chat-header h1 {
+        font-size: 1.4rem;
+    }
+
 }

@@ -1,112 +1,139 @@
-/*
-==================================================
-    CHAT IA - SCRIPT PRINCIPAL
-    MAIN CHAT SCRIPT
-==================================================
+/* =========================================================
+    ENVIAR MENSAJE
+    SEND MESSAGE
+========================================================= */
 
-ES:
-Este archivo:
-1. Obtiene el mensaje del usuario
-2. Lo envía al servidor Flask
-3. Recibe la respuesta de la IA
-4. Muestra la respuesta en pantalla
+async function enviarMensaje(){
 
-EN:
-This file:
-1. Gets the user's message
-2. Sends it to the Flask server
-3. Receives the AI response
-4. Displays the response on screen
+    // INPUT
+    // USER INPUT
+    const input = document.getElementById("mensaje");
 
-Porque aparentemente los humanos disfrutan
-hacer que JavaScript hable con Python 🫠
-==================================================
-*/
+    // TEXTO
+    // TEXT
+    const mensaje = input.value.trim();
 
-/* ==================================================
-    FUNCIÓN PRINCIPAL DEL CHAT
-    MAIN CHAT FUNCTION
-================================================== */
-
-async function enviarMensaje() {
-
-    // ==========================================
-    // OBTENER INPUT
-    // GET INPUT ELEMENT
-    // ==========================================
-
-    let input = document.getElementById("mensaje");
-
-    // ==========================================
-    // OBTENER TEXTO
-    // GET USER MESSAGE
-    // ==========================================
-
-    let mensaje = input.value.trim();
-
-    // ==========================================
     // EVITAR MENSAJES VACÍOS
     // PREVENT EMPTY MESSAGES
-    // ==========================================
+    if(mensaje === "") return;
 
-    if (mensaje === "") return;
+    // CONTENEDOR CHAT
+    // CHAT CONTAINER
+    const chatBox = document.getElementById("chatBox");
 
-    // ==========================================
-    // ENVIAR MENSAJE AL SERVIDOR
-    // SEND MESSAGE TO SERVER
-    // ==========================================
+    /* =====================================================
+        MENSAJE USUARIO
+        USER MESSAGE
+    ===================================================== */
 
-    let respuesta = await fetch("/chat", {
+    const userMsg = document.createElement("div");
 
-        // Método HTTP
-        // HTTP method
-        method: "POST",
+    userMsg.className = "msg user";
 
-        // Tipo de contenido enviado
-        // Sent content type
-        headers: {
-            "Content-Type": "application/x-www-form-urlencoded"
-        },
+    userMsg.innerText = mensaje;
 
-        // Datos enviados al backend
-        // Data sent to backend
-        body: "mensaje=" + encodeURIComponent(mensaje)
-    });
+    chatBox.appendChild(userMsg);
 
-    // ==========================================
-    // OBTENER RESPUESTA DE LA IA
-    // GET AI RESPONSE
-    // ==========================================
-
-    let texto = await respuesta.text();
-
-    // ==========================================
-    // MOSTRAR RESPUESTA EN HTML
-    // DISPLAY RESPONSE IN HTML
-    // ==========================================
-
-    document.getElementById("respuesta").innerText = texto;
-
-    // ==========================================
-    // LIMPIAR INPUT
-    // CLEAR INPUT
-    // ==========================================
+    /* =====================================================
+        LIMPIAR INPUT
+        CLEAR INPUT
+    ===================================================== */
 
     input.value = "";
+
+    /* =====================================================
+        MENSAJE IA
+        AI MESSAGE
+    ===================================================== */
+
+    const botMsg = document.createElement("div");
+
+    botMsg.className = "msg bot";
+
+    botMsg.innerText = "";
+
+    chatBox.appendChild(botMsg);
+
+    // SCROLL AUTOMÁTICO
+    // AUTO SCROLL
+    chatBox.scrollTop = chatBox.scrollHeight;
+
+    /* =====================================================
+        PETICIÓN AL BACKEND
+        BACKEND REQUEST
+    ===================================================== */
+
+    try{
+
+        const respuesta = await fetch("/chat", {
+
+            method:"POST",
+
+            headers:{
+                "Content-Type":"application/x-www-form-urlencoded"
+            },
+
+            body:"mensaje=" + encodeURIComponent(mensaje)
+        });
+
+        /* =================================================
+            STREAMING
+            REAL TIME STREAM
+        ================================================= */
+
+        const reader = respuesta.body.getReader();
+
+        const decoder = new TextDecoder();
+
+        while(true){
+
+            // LEER CHUNK
+            // READ CHUNK
+            const { done, value } = await reader.read();
+
+            // TERMINAR STREAM
+            // END STREAM
+            if(done) break;
+
+            // DECODIFICAR TEXTO
+            // DECODE TEXT
+            const texto = decoder.decode(value);
+
+            // AGREGAR RESPUESTA
+            // APPEND RESPONSE
+            botMsg.innerText += texto;
+
+            // SCROLL ABAJO
+            // AUTO SCROLL DOWN
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+    }
+
+    catch(error){
+
+        // ERROR
+        console.error(error);
+
+        botMsg.innerText =
+            "Error conectando con la IA local.";
+    }
 }
 
-/* ==================================================
-    ENVIAR CON ENTER
-    SEND MESSAGE WITH ENTER KEY
-================================================== */
+/* =========================================================
+    ENTER PARA ENVIAR
+    ENTER TO SEND
+========================================================= */
 
 document
 .getElementById("mensaje")
-.addEventListener("keypress", function(event) {
+.addEventListener("keydown", function(event){
 
-    // Si el usuario presiona ENTER
-    // If user presses ENTER
-    if (event.key === "Enter") {
+    // ENTER SIN SHIFT
+    // ENTER WITHOUT SHIFT
+    if(event.key === "Enter" && !event.shiftKey){
+
+        event.preventDefault();
 
         enviarMensaje();
     }
