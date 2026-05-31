@@ -1,140 +1,81 @@
-/* =========================================================
-    ENVIAR MENSAJE
-    SEND MESSAGE
-========================================================= */
+const input = document.getElementById("mensaje");
+const chatBox = document.getElementById("chatBox");
 
-async function enviarMensaje(){
 
-    // INPUT
-    // USER INPUT
-    const input = document.getElementById("mensaje");
+function agregarMensaje(texto, tipo) {
+    const mensaje = document.createElement("div");
 
-    // TEXTO
-    // TEXT
-    const mensaje = input.value.trim();
+    mensaje.className = `message ${tipo}-message`;
+    mensaje.innerText = texto;
 
-    // EVITAR MENSAJES VACÍOS
-    // PREVENT EMPTY MESSAGES
-    if(mensaje === "") return;
-
-    // CONTENEDOR CHAT
-    // CHAT CONTAINER
-    const chatBox = document.getElementById("chatBox");
-
-    /* =====================================================
-        MENSAJE USUARIO
-        USER MESSAGE
-    ===================================================== */
-
-    const userMsg = document.createElement("div");
-
-    userMsg.className = "msg user";
-
-    userMsg.innerText = mensaje;
-
-    chatBox.appendChild(userMsg);
-
-    /* =====================================================
-        LIMPIAR INPUT
-        CLEAR INPUT
-    ===================================================== */
-
-    input.value = "";
-
-    /* =====================================================
-        MENSAJE IA
-        AI MESSAGE
-    ===================================================== */
-
-    const botMsg = document.createElement("div");
-
-    botMsg.className = "msg bot";
-
-    botMsg.innerText = "";
-
-    chatBox.appendChild(botMsg);
-
-    // SCROLL AUTOMÁTICO
-    // AUTO SCROLL
+    chatBox.appendChild(mensaje);
     chatBox.scrollTop = chatBox.scrollHeight;
 
-    /* =====================================================
-        PETICIÓN AL BACKEND
-        BACKEND REQUEST
-    ===================================================== */
+    return mensaje;
+}
 
-    try{
 
-        const respuesta = await fetch("/chat", {
+async function enviarMensaje() {
+    const texto = input.value.trim();
 
-            method:"POST",
-
-            headers:{
-                "Content-Type":"application/x-www-form-urlencoded"
-            },
-
-            body:"mensaje=" + encodeURIComponent(mensaje)
-        });
-
-        /* =================================================
-            STREAMING
-            REAL TIME STREAM
-        ================================================= */
-
-        const reader = respuesta.body.getReader();
-
-        const decoder = new TextDecoder();
-
-        while(true){
-
-            // LEER CHUNK
-            // READ CHUNK
-            const { done, value } = await reader.read();
-
-            // TERMINAR STREAM
-            // END STREAM
-            if(done) break;
-
-            // DECODIFICAR TEXTO
-            // DECODE TEXT
-            const texto = decoder.decode(value);
-
-            // AGREGAR RESPUESTA
-            // APPEND RESPONSE
-            botMsg.innerText += texto;
-
-            // SCROLL ABAJO
-            // AUTO SCROLL DOWN
-            chatBox.scrollTop = chatBox.scrollHeight;
-        }
-
+    if (texto === "") {
+        return;
     }
 
-    catch(error){
+    agregarMensaje(texto, "user");
+    input.value = "";
 
-        // ERROR
+    const respuestaIA = agregarMensaje("", "ai");
+
+    try {
+        const respuesta = await fetch("/chat", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: `mensaje=${encodeURIComponent(texto)}`,
+        });
+
+        const reader = respuesta.body.getReader();
+        const decoder = new TextDecoder();
+
+        while (true) {
+            const { done, value } = await reader.read();
+
+            if (done) {
+                break;
+            }
+
+            respuestaIA.innerText += decoder.decode(value);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+    } catch (error) {
         console.error(error);
-
-        botMsg.innerText =
-            "Error conectando con la IA local.";
+        respuestaIA.innerText = "Error conectando con la IA local.";
     }
 }
 
-/* =========================================================
-    ENTER PARA ENVIAR
-    ENTER TO SEND
-========================================================= */
 
-document
-.getElementById("mensaje")
-.addEventListener("keydown", function(event){
+async function mostrarMemoria() {
+    agregarMensaje("¿Qué recuerdas de mí?", "user");
 
-    // ENTER SIN SHIFT
-    // ENTER WITHOUT SHIFT
-    if(event.key === "Enter" && !event.shiftKey){
+    const respuestaIA = agregarMensaje("", "ai");
 
+    try {
+        const respuesta = await fetch("/memories");
+        const data = await respuesta.json();
+
+        respuestaIA.innerText = data.text;
+    } catch (error) {
+        console.error(error);
+        respuestaIA.innerText = "No pude leer la memoria local.";
+    }
+}
+
+
+input.addEventListener("keydown", function (event) {
+    if (event.key === "Enter" && !event.shiftKey) {
         event.preventDefault();
-
         enviarMensaje();
     }
 });

@@ -8,10 +8,13 @@ The goal is to build a simple local-first assistant that is easy to inspect, mod
 
 - Local Ollama model support
 - Flask backend
+- Cleaner backend split into `app.py`, `config.py`, and `memory.py`
 - Separate HTML, CSS, and JavaScript frontend
 - Personality prompt loaded from a text file
 - Persistent chat history stored in JSON
 - Separate user memories stored in JSON
+- Memory inspection command: `¿Qué recuerdas de mí?`
+- Memory inspection endpoint: `/memories`
 - Private memory files ignored by Git
 - Example JSON memory files included for reference
 - No external APIs required
@@ -21,6 +24,8 @@ The goal is to build a simple local-first assistant that is easy to inspect, mod
 ```plaintext
 web_chat_IA/
 +-- app.py
++-- config.py
++-- memory.py
 +-- prompts/
 |   +-- personalidad.txt
 +-- static/
@@ -134,6 +139,20 @@ data/example_memory.json
 data/example_recuerdos.json
 ```
 
+You can inspect the current saved user memories from the chat by typing:
+
+```plaintext
+¿Qué recuerdas de mí?
+```
+
+The frontend also includes a `Ver memoria` button, and the backend exposes a JSON endpoint:
+
+```plaintext
+/memories
+```
+
+Memory logic is separated in `memory.py`, so the storage system can later move from JSON to SQLite, embeddings, or a vector database without rewriting the whole Flask app.
+
 ## Privacy
 
 This project:
@@ -168,10 +187,13 @@ La idea es crear un asistente local simple, fácil de revisar, modificar y enten
 
 - Soporte para modelos locales de Ollama
 - Backend con Flask
+- Backend más ordenado con `app.py`, `config.py` y `memory.py`
 - Frontend separado con HTML, CSS y JavaScript
 - Personalidad cargada desde un archivo de texto
 - Historial persistente guardado en JSON
 - Recuerdos del usuario guardados por separado en JSON
+- Comando para inspeccionar memoria: `¿Qué recuerdas de mí?`
+- Endpoint para revisar memoria: `/memories`
 - Archivos privados de memoria ignorados por Git
 - Archivos JSON de ejemplo incluidos como referencia
 - No requiere APIs externas
@@ -271,6 +293,20 @@ data/example_memory.json
 data/example_recuerdos.json
 ```
 
+Puedes revisar los recuerdos guardados desde el chat escribiendo:
+
+```plaintext
+¿Qué recuerdas de mí?
+```
+
+La interfaz también tiene un botón `Ver memoria`, y el backend incluye un endpoint en JSON:
+
+```plaintext
+/memories
+```
+
+La lógica de memoria está separada en `memory.py`, así que más adelante se puede cambiar de JSON a SQLite, embeddings o una base vectorial sin reescribir toda la app de Flask.
+
 ## Privacidad
 
 Este proyecto:
@@ -283,4 +319,4 @@ Este proyecto:
 
 ## Estado Del Proyecto
 
-Este proyecto está en desarrollo. La memoria actual usa JSON porque es simple, transparente y fácil de modificar. Más adelante se podrían agregar mejoras como mejor organización de recuerdos, búsqueda semántica, RAG o una interfaz más completa.
+Este proyecto está en desarrollo. La memoria actual usa JSON porque es simple, transparente y fácil de modificar. La estructura ya está separada para poder crecer después hacia SQLite, búsqueda semántica, RAG o una interfaz más completa.
