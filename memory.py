@@ -1,9 +1,16 @@
 import json
 import os
+import re
 import string
 import unicodedata
 
-from config import CHAT_MEMORY_FILE, DATA_DIR, USER_MEMORIES_FILE
+from config import (
+    CHAT_MEMORY_FILE,
+    DATA_DIR,
+    MAX_MESSAGE_CHARS,
+    MAX_SAVED_HISTORY_MESSAGES,
+    USER_MEMORIES_FILE,
+)
 
 
 MEMORY_TRIGGERS = [
@@ -22,6 +29,13 @@ MEMORY_QUESTIONS = [
     "what do you know about me",
 ]
 
+QUICK_REPLIES = {
+    "hola": "Hola. Estoy lista para ayudarte a programar.",
+    "buenos dias": "Buenos dias. Lista para revisar, corregir o construir codigo contigo.",
+    "buen dia": "Buen dia. Que codigo mejoramos hoy?",
+    "buenas": "Buenas. Ya estoy despierta, mas o menos como cualquier IA local con cafe imaginario.",
+    "gracias": "De nada. La humanidad sobrevive otro commit.",
+}
 
 def ensure_data_folder():
     os.makedirs(DATA_DIR, exist_ok=True)
@@ -52,11 +66,41 @@ def load_chat_history(personality):
         }
     ]
 
-    return load_json_file(CHAT_MEMORY_FILE, default_history)
+    history = load_json_file(CHAT_MEMORY_FILE, default_history)
+    return trim_saved_history(remove_system_messages(history))
 
 
 def save_chat_history(history):
-    save_json_file(CHAT_MEMORY_FILE, history)
+    save_json_file(CHAT_MEMORY_FILE, trim_saved_history(history))
+
+
+def build_chat_context(history, max_messages):
+    recent_history = remove_system_messages(history)[-max_messages:]
+    return [truncate_message(message) for message in recent_history]
+
+
+def remove_system_messages(history):
+    return [
+        message
+        for message in history
+        if message.get("role") in ["user", "assistant"]
+    ]
+
+
+def trim_saved_history(history):
+    return remove_system_messages(history)[-MAX_SAVED_HISTORY_MESSAGES:]
+
+
+def truncate_message(message):
+    content = message.get("content", "")
+
+    if len(content) <= MAX_MESSAGE_CHARS:
+        return message
+
+    return {
+        "role": message.get("role", "user"),
+        "content": content[:MAX_MESSAGE_CHARS] + "\n[Message shortened for speed]",
+    }
 
 
 def load_user_memories():
@@ -70,6 +114,11 @@ def save_user_memories(memories):
 def should_show_memories(message):
     normalized_message = normalize_message(message)
     return normalized_message in MEMORY_QUESTIONS
+
+
+def get_quick_reply(message):
+    normalized_message = normalize_message(message)
+    return QUICK_REPLIES.get(normalized_message)
 
 
 def should_remember_message(message):
@@ -120,3 +169,7 @@ def normalize_message(message):
     )
 
     return " ".join(without_punctuation.split())
+
+
+def clean_model_output(text):
+    return re.sub(r"\n?\[[^\]]{1,80}\]\s*", "", text).strip()

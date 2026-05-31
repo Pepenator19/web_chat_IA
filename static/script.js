@@ -15,6 +15,11 @@ function agregarMensaje(texto, tipo) {
 }
 
 
+function limpiarRespuestaModelo(texto) {
+    return texto.replace(/\n?\[[^\]]{1,80}\]\s*/g, "").trim();
+}
+
+
 async function enviarMensaje() {
     const texto = input.value.trim();
 
@@ -49,6 +54,9 @@ async function enviarMensaje() {
             respuestaIA.innerText += decoder.decode(value);
             chatBox.scrollTop = chatBox.scrollHeight;
         }
+
+        respuestaIA.innerText = limpiarRespuestaModelo(respuestaIA.innerText);
+        chatBox.scrollTop = chatBox.scrollHeight;
     } catch (error) {
         console.error(error);
         respuestaIA.innerText = "Error conectando con la IA local.";
