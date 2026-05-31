@@ -8,16 +8,37 @@ The goal is to build a simple local-first assistant that is easy to inspect, mod
 
 - Local Ollama model support
 - Flask backend
-- Cleaner backend split into `app.py`, `config.py`, and `memory.py`
+- Backend split into `app.py`, `config.py`, and `memory.py`
 - Separate HTML, CSS, and JavaScript frontend
-- Personality prompt loaded from a text file
+- Personality prompt loaded from `prompts/personalidad.txt`
 - Persistent chat history stored in JSON
 - Separate user memories stored in JSON
-- Memory inspection command: `¿Qué recuerdas de mí?`
+- Memory inspection command: `Que recuerdas de mi?`
+- Memory inspection button: `Ver memoria`
 - Memory inspection endpoint: `/memories`
+- Quick replies for simple greetings
+- Optimized context sent to Ollama for faster responses
 - Private memory files ignored by Git
 - Example JSON memory files included for reference
 - No external APIs required
+
+## Recent Update
+
+This update makes the project more organized and closer to a real local assistant:
+
+- Added `config.py` for settings and paths
+- Added `memory.py` for memory loading, saving, formatting, and cleanup
+- Moved real memory files into `data/`
+- Added public example memory files
+- Added a `Ver memoria` button in the frontend
+- Added `/memories` JSON endpoint
+- Added quick replies for simple messages like `hola`, `buenos dias`, and `gracias`
+- Reduced the amount of chat history sent to Ollama
+- Trimmed long previous messages before sending context to the model
+- Added `keep_alive` so Ollama keeps the model loaded longer
+- Cleaned model artifacts like `[Celebratory response]`
+- Updated the assistant personality
+- Reworked the README
 
 ## Project Structure
 
@@ -54,7 +75,7 @@ Before running the project, install:
 
 Download Ollama:
 
-```bash
+```plaintext
 https://ollama.com
 ```
 
@@ -84,7 +105,7 @@ Create a virtual environment:
 python -m venv venv
 ```
 
-Activate the virtual environment:
+Activate the virtual environment.
 
 Windows:
 
@@ -114,7 +135,7 @@ python app.py
 
 Open the local address shown in your terminal, usually:
 
-```bash
+```plaintext
 http://127.0.0.1:5000
 ```
 
@@ -139,10 +160,10 @@ data/example_memory.json
 data/example_recuerdos.json
 ```
 
-You can inspect the current saved user memories from the chat by typing:
+You can inspect saved user memories from the chat by typing:
 
 ```plaintext
-¿Qué recuerdas de mí?
+Que recuerdas de mi?
 ```
 
 The frontend also includes a `Ver memoria` button, and the backend exposes a JSON endpoint:
@@ -152,6 +173,23 @@ The frontend also includes a `Ver memoria` button, and the backend exposes a JSO
 ```
 
 Memory logic is separated in `memory.py`, so the storage system can later move from JSON to SQLite, embeddings, or a vector database without rewriting the whole Flask app.
+
+## Speed Optimizations
+
+The app includes a few simple optimizations to make local responses faster:
+
+- Sends only a small number of recent messages to Ollama
+- Trims long old messages before sending them as context
+- Uses `keep_alive` to keep the Ollama model loaded for a while
+- Uses quick replies for simple greetings without calling Ollama
+- Prints response timing in the terminal
+
+Example terminal messages:
+
+```plaintext
+Quick reply used: 0.00s
+Ollama response time: 2.34s
+```
 
 ## Privacy
 
@@ -177,98 +215,41 @@ data/*.json
 !data/example_recuerdos.json
 ```
 
-## Español
+## Espanol
 
-Proyecto pequeño de chat con IA local construido con Flask y Ollama.
+Proyecto pequeno de chat con IA local construido con Flask y Ollama.
 
-La idea es crear un asistente local simple, fácil de revisar, modificar y entender. Todo corre en tu propia computadora, usa un modelo local de Ollama y guarda la memoria en archivos JSON locales.
+La idea es crear un asistente local simple, facil de revisar, modificar y entender. Todo corre en tu computadora, usa un modelo local de Ollama y guarda la memoria en archivos JSON locales.
 
-## Características
+## Caracteristicas
 
 - Soporte para modelos locales de Ollama
 - Backend con Flask
-- Backend más ordenado con `app.py`, `config.py` y `memory.py`
+- Backend dividido en `app.py`, `config.py` y `memory.py`
 - Frontend separado con HTML, CSS y JavaScript
-- Personalidad cargada desde un archivo de texto
+- Personalidad cargada desde `prompts/personalidad.txt`
 - Historial persistente guardado en JSON
 - Recuerdos del usuario guardados por separado en JSON
-- Comando para inspeccionar memoria: `¿Qué recuerdas de mí?`
+- Comando para revisar memoria: `Que recuerdas de mi?`
+- Boton para revisar memoria: `Ver memoria`
 - Endpoint para revisar memoria: `/memories`
+- Respuestas rapidas para saludos simples
+- Contexto optimizado para responder mas rapido
 - Archivos privados de memoria ignorados por Git
 - Archivos JSON de ejemplo incluidos como referencia
 - No requiere APIs externas
 
-## Requisitos
-
-Antes de ejecutar el proyecto necesitas:
-
-- Python 3.10 o superior
-- Git
-- Ollama
-
-Descarga Ollama:
-
-```bash
-https://ollama.com
-```
-
-Instala un modelo local, por ejemplo:
-
-```bash
-ollama pull phi3
-```
-
-## Instalación
-
-Clona el repositorio:
-
-```bash
-git clone https://github.com/Pepenator19/web_chat_IA.git
-```
-
-Entra a la carpeta:
-
-```bash
-cd web_chat_IA
-```
-
-Crea un entorno virtual:
-
-```bash
-python -m venv venv
-```
-
-Activa el entorno virtual:
-
-Windows:
-
-```bash
-venv\Scripts\activate
-```
-
-Linux / macOS:
-
-```bash
-source venv/bin/activate
-```
-
-Instala las dependencias:
-
-```bash
-pip install -r requirements.txt
-```
-
 ## Ejecutar El Proyecto
 
-Asegúrate de que Ollama esté abierto y funcionando. Después ejecuta:
+Asegurate de que Ollama este abierto y funcionando. Despues ejecuta:
 
 ```bash
 python app.py
 ```
 
-Abre la dirección local que aparece en la terminal, normalmente:
+Abre la direccion local que aparece en la terminal, normalmente:
 
-```bash
+```plaintext
 http://127.0.0.1:5000
 ```
 
@@ -286,7 +267,7 @@ data/recuerdos.json
 
 Estos archivos son privados y Git los ignora.
 
-También hay archivos de ejemplo para mostrar el formato sin subir datos personales reales:
+Tambien hay archivos de ejemplo para mostrar el formato sin subir datos personales reales:
 
 ```plaintext
 data/example_memory.json
@@ -296,27 +277,15 @@ data/example_recuerdos.json
 Puedes revisar los recuerdos guardados desde el chat escribiendo:
 
 ```plaintext
-¿Qué recuerdas de mí?
+Que recuerdas de mi?
 ```
 
-La interfaz también tiene un botón `Ver memoria`, y el backend incluye un endpoint en JSON:
+La interfaz tambien tiene un boton `Ver memoria`, y el backend incluye un endpoint en JSON:
 
 ```plaintext
 /memories
 ```
 
-La lógica de memoria está separada en `memory.py`, así que más adelante se puede cambiar de JSON a SQLite, embeddings o una base vectorial sin reescribir toda la app de Flask.
-
-## Privacidad
-
-Este proyecto:
-
-- Funciona localmente con Ollama
-- No usa APIs externas
-- No envía conversaciones a servicios en la nube
-- Guarda la memoria en tu propia computadora
-- Mantiene los archivos reales de memoria fuera de Git
-
 ## Estado Del Proyecto
 
-Este proyecto está en desarrollo. La memoria actual usa JSON porque es simple, transparente y fácil de modificar. La estructura ya está separada para poder crecer después hacia SQLite, búsqueda semántica, RAG o una interfaz más completa.
+Este proyecto esta en desarrollo. La memoria actual usa JSON porque es simple, transparente y facil de modificar. La estructura ya esta separada para poder crecer despues hacia SQLite, busqueda semantica, RAG o una interfaz mas completa.
