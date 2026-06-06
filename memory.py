@@ -20,6 +20,14 @@ MEMORY_TRIGGERS = [
     "mi laptop",
     "uso",
     "soy",
+    "programo en",
+    "trabajo con",
+    "mi stack",
+    "mi proyecto",
+    "estoy aprendiendo",
+    "prefiero",
+    "mi lenguaje",
+    "mi framework",
 ]
 
 MEMORY_QUESTIONS = [
@@ -30,11 +38,16 @@ MEMORY_QUESTIONS = [
 ]
 
 QUICK_REPLIES = {
-    "hola": "Hola. Estoy lista para ayudarte a programar.",
-    "buenos dias": "Buenos dias. Lista para revisar, corregir o construir codigo contigo.",
-    "buen dia": "Buen dia. Que codigo mejoramos hoy?",
-    "buenas": "Buenas. Ya estoy despierta, mas o menos como cualquier IA local con cafe imaginario.",
-    "gracias": "De nada. La humanidad sobrevive otro commit.",
+    "hola": "Hola. Estoy lista para programar, depurar o revisar codigo contigo.",
+    "buenos dias": "Buenos dias. Elige un modo arriba y dime que codigo construimos hoy.",
+    "buen dia": "Buen dia. Que bug cazamos o que feature armamos?",
+    "buenas": "Buenas. Tu IDE local favorita ya esta despierta.",
+    "gracias": "De nada. Otro commit salvado de la humanidad.",
+    "ayuda": (
+        "Puedo ayudarte a programar, depurar, explicar, refactorizar y revisar codigo.\n"
+        "Usa los modos de arriba, pega bloques de codigo entre ``` y elige un lenguaje si quieres.\n"
+        "Atajos utiles: Ctrl+Enter enviar, Ctrl+K limpiar chat."
+    ),
 }
 
 def ensure_data_folder():
@@ -97,9 +110,27 @@ def truncate_message(message):
     if len(content) <= MAX_MESSAGE_CHARS:
         return message
 
+    if "```" in content:
+        code_start = content.find("```")
+        code_end = content.rfind("```")
+
+        if code_start != -1 and code_end > code_start:
+            prefix = content[:code_start].strip()
+            code_block = content[code_start : code_end + 3]
+            max_code_chars = MAX_MESSAGE_CHARS - len(prefix) - 40
+
+            if len(code_block) > max_code_chars:
+                code_block = code_block[:max_code_chars] + "\n```"
+
+            shortened = "\n\n".join(part for part in [prefix, code_block] if part)
+            return {
+                "role": message.get("role", "user"),
+                "content": shortened + "\n[Mensaje acortado para velocidad]",
+            }
+
     return {
         "role": message.get("role", "user"),
-        "content": content[:MAX_MESSAGE_CHARS] + "\n[Message shortened for speed]",
+        "content": content[:MAX_MESSAGE_CHARS] + "\n[Mensaje acortado para velocidad]",
     }
 
 

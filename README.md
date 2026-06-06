@@ -1,14 +1,25 @@
 # web_chat_IA
 
-A small local AI chat project built with Flask and Ollama.
+A local-first coding assistant built with Flask and Ollama.
 
-The goal is to build a simple local-first assistant that is easy to inspect, modify, and understand. It runs on your own machine, uses a local Ollama model, and stores memory in local JSON files.
+The goal is to offer a simple, private, and hackable programming assistant that runs on your own machine. It uses a local Ollama model, keeps memory in JSON files, and includes an IDE-style web UI for writing, debugging, explaining, refactoring, and reviewing code.
+
+Default model:
+
+```plaintext
+qwen2.5-coder:3b-instruct
+```
 
 ## Features
 
 - Local Ollama model support
-- Flask backend
-- Backend split into `app.py`, `config.py`, and `memory.py`
+- Coding-focused assistant personality
+- 5 work modes: Program, Debug, Explain, Refactor, Review
+- Language selector: Python, JavaScript, TypeScript, HTML, CSS, SQL, and more
+- IDE-style dark UI with syntax highlighting
+- Copy button on every code block
+- Quick prompt chips per mode
+- Flask backend split into `app.py`, `config.py`, `memory.py`, and `coding.py`
 - Separate HTML, CSS, and JavaScript frontend
 - Personality prompt loaded from `prompts/personalidad.txt`
 - Persistent chat history stored in JSON
@@ -16,29 +27,32 @@ The goal is to build a simple local-first assistant that is easy to inspect, mod
 - Memory inspection command: `Que recuerdas de mi?`
 - Memory inspection button: `Ver memoria`
 - Memory inspection endpoint: `/memories`
-- Quick replies for simple greetings
-- Optimized context sent to Ollama for faster responses
+- Chat reset endpoint: `/clear`
+- Coding modes endpoint: `/modes`
+- Quick replies for simple greetings and help
+- Streaming responses from Ollama
 - Private memory files ignored by Git
 - Example JSON memory files included for reference
 - No external APIs required
 
 ## Recent Update
 
-This update makes the project more organized and closer to a real local assistant:
+This release turns the project into a real local coding assistant:
 
-- Added `config.py` for settings and paths
-- Added `memory.py` for memory loading, saving, formatting, and cleanup
-- Moved real memory files into `data/`
-- Added public example memory files
-- Added a `Ver memoria` button in the frontend
-- Added `/memories` JSON endpoint
-- Added quick replies for simple messages like `hola`, `buenos dias`, and `gracias`
-- Reduced the amount of chat history sent to Ollama
-- Trimmed long previous messages before sending context to the model
-- Added `keep_alive` so Ollama keeps the model loaded longer
-- Cleaned model artifacts like `[Celebratory response]`
-- Updated the assistant personality
-- Reworked the README
+- Added `coding.py` with programming modes and mode-specific prompts
+- Added 5 coding modes: Program, Debug, Explain, Refactor, Review
+- Added language selector with auto-detect and common languages
+- Redesigned the frontend into an IDE-style workspace
+- Added syntax highlighting with Highlight.js
+- Added copy buttons for code blocks
+- Added quick prompt chips for each mode
+- Added clear chat button and `/clear` endpoint
+- Added `/modes` endpoint for frontend mode loading
+- Increased coding context limits for better code answers
+- Expanded memory triggers for technical preferences
+- Improved code-aware message truncation
+- Updated personality prompt for programming tasks
+- Tuned temperature per mode for more precise coding answers
 
 ## Project Structure
 
@@ -47,6 +61,7 @@ web_chat_IA/
 +-- app.py
 +-- config.py
 +-- memory.py
++-- coding.py
 +-- prompts/
 |   +-- personalidad.txt
 +-- static/
@@ -82,7 +97,7 @@ https://ollama.com
 Install a local model, for example:
 
 ```bash
-ollama pull phi3
+ollama pull qwen2.5-coder:3b-instruct
 ```
 
 ## Installation
@@ -139,6 +154,42 @@ Open the local address shown in your terminal, usually:
 http://127.0.0.1:5000
 ```
 
+## Coding Modes
+
+The assistant supports 5 programming modes:
+
+| Mode | Purpose |
+|------|---------|
+| Program | Generate clean and functional code |
+| Debug | Find and fix bugs |
+| Explain | Explain code or concepts |
+| Refactor | Improve structure and readability |
+| Review | Do a code review with severity levels |
+
+Each mode changes the system prompt and model temperature for better results.
+
+## UI Shortcuts
+
+- `Ctrl + Enter` send message
+- `Ctrl + K` clear chat
+- `Shift + Enter` new line in the textarea
+
+## API Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/` | GET | Main chat UI |
+| `/chat` | POST | Send a message to the assistant |
+| `/modes` | GET | List available coding modes |
+| `/memories` | GET | Return saved user memories |
+| `/clear` | POST | Clear saved chat history |
+
+`/chat` accepts these form fields:
+
+- `mensaje` required message text
+- `modo` optional mode: `programar`, `debug`, `explicar`, `refactor`, `revisar`
+- `lenguaje` optional language hint: `auto`, `python`, `javascript`, etc.
+
 ## Local Memory
 
 The project stores memory locally using JSON files:
@@ -174,21 +225,30 @@ The frontend also includes a `Ver memoria` button, and the backend exposes a JSO
 
 Memory logic is separated in `memory.py`, so the storage system can later move from JSON to SQLite, embeddings, or a vector database without rewriting the whole Flask app.
 
-## Speed Optimizations
+## Model Settings
 
-The app includes a few simple optimizations to make local responses faster:
+Current defaults in `config.py`:
 
-- Sends only a small number of recent messages to Ollama
-- Trims long old messages before sending them as context
-- Uses `keep_alive` to keep the Ollama model loaded for a while
-- Uses quick replies for simple greetings without calling Ollama
-- Prints response timing in the terminal
+- `MAX_HISTORY_MESSAGES = 8`
+- `MAX_MESSAGE_CHARS = 2500`
+- `MAX_RESPONSE_TOKENS = 2048`
+- `OLLAMA_CONTEXT_SIZE = 8192`
+- `OLLAMA_KEEP_ALIVE = 15m`
+
+You can change the model with the `OLLAMA_MODEL` environment variable without editing the code.
+
+Example:
+
+```bash
+set OLLAMA_MODEL=qwen2.5-coder:3b-instruct
+python app.py
+```
 
 Example terminal messages:
 
 ```plaintext
 Quick reply used: 0.00s
-Ollama response time: 2.34s
+Ollama response time (debug): 2.34s
 ```
 
 ## Privacy
@@ -217,15 +277,20 @@ data/*.json
 
 ## Espanol
 
-Proyecto pequeno de chat con IA local construido con Flask y Ollama.
+Proyecto de asistente de programacion local construido con Flask y Ollama.
 
-La idea es crear un asistente local simple, facil de revisar, modificar y entender. Todo corre en tu computadora, usa un modelo local de Ollama y guarda la memoria en archivos JSON locales.
+La idea es crear un asistente local simple, privado y facil de modificar. Todo corre en tu computadora, usa un modelo local de Ollama y guarda la memoria en archivos JSON.
 
 ## Caracteristicas
 
 - Soporte para modelos locales de Ollama
-- Backend con Flask
-- Backend dividido en `app.py`, `config.py` y `memory.py`
+- Asistente enfocado en programacion
+- 5 modos de trabajo: Programar, Debug, Explicar, Refactor, Revisar
+- Selector de lenguaje: Python, JavaScript, TypeScript, HTML, CSS, SQL y mas
+- Interfaz oscura estilo IDE con resaltado de sintaxis
+- Boton para copiar bloques de codigo
+- Chips de prompts rapidos por modo
+- Backend dividido en `app.py`, `config.py`, `memory.py` y `coding.py`
 - Frontend separado con HTML, CSS y JavaScript
 - Personalidad cargada desde `prompts/personalidad.txt`
 - Historial persistente guardado en JSON
@@ -233,11 +298,28 @@ La idea es crear un asistente local simple, facil de revisar, modificar y entend
 - Comando para revisar memoria: `Que recuerdas de mi?`
 - Boton para revisar memoria: `Ver memoria`
 - Endpoint para revisar memoria: `/memories`
-- Respuestas rapidas para saludos simples
-- Contexto optimizado para responder mas rapido
+- Endpoint para limpiar chat: `/clear`
+- Endpoint de modos: `/modes`
+- Respuestas en streaming desde Ollama
 - Archivos privados de memoria ignorados por Git
 - Archivos JSON de ejemplo incluidos como referencia
 - No requiere APIs externas
+
+## Modos De Programacion
+
+| Modo | Uso |
+|------|-----|
+| Programar | Generar codigo limpio y funcional |
+| Debug | Encontrar y corregir errores |
+| Explicar | Explicar codigo o conceptos |
+| Refactor | Mejorar estructura y legibilidad |
+| Revisar | Hacer code review con severidad |
+
+## Atajos De La Interfaz
+
+- `Ctrl + Enter` enviar mensaje
+- `Ctrl + K` limpiar chat
+- `Shift + Enter` nueva linea
 
 ## Ejecutar El Proyecto
 
@@ -288,4 +370,4 @@ La interfaz tambien tiene un boton `Ver memoria`, y el backend incluye un endpoi
 
 ## Estado Del Proyecto
 
-Este proyecto esta en desarrollo. La memoria actual usa JSON porque es simple, transparente y facil de modificar. La estructura ya esta separada para poder crecer despues hacia SQLite, busqueda semantica, RAG o una interfaz mas completa.
+Este proyecto esta en desarrollo activo. La memoria actual usa JSON porque es simple, transparente y facil de modificar. La estructura ya esta separada para poder crecer despues hacia subida de archivos, snippets guardados, SQLite, busqueda semantica o RAG.

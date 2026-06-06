@@ -2,7 +2,10 @@ from flask import Flask, Response, jsonify, render_template, request
 import ollama
 from time import perf_counter
 
+from coding import build_mode_context, get_model_options, list_modes, normalize_language, normalize_mode
 from config import (
+    APP_SUBTITLE,
+    APP_TITLE,
     MAX_HISTORY_MESSAGES,
     MAX_RESPONSE_TOKENS,
     OLLAMA_CONTEXT_SIZE,
@@ -40,7 +43,17 @@ recuerdos = load_user_memories()
 
 @app.route("/")
 def index():
-    return render_template("index.html")
+    return render_template(
+        "index.html",
+        app_title=APP_TITLE,
+        app_subtitle=APP_SUBTITLE,
+        model_name=OLLAMA_MODEL,
+    )
+
+
+@app.route("/modes", methods=["GET"])
+def modes():
+    return jsonify({"modes": list_modes()})
 
 
 @app.route("/memories", methods=["GET"])
@@ -54,12 +67,24 @@ def memories():
     )
 
 
+@app.route("/clear", methods=["POST"])
+def clear_chat():
+    global historial
+
+    historial = load_chat_history(personalidad)
+    save_chat_history(historial)
+
+    return jsonify({"ok": True, "message": "Historial del chat limpiado."})
+
+
 @app.route("/chat", methods=["POST"])
 def chat():
     global historial
     global recuerdos
 
-    mensaje = request.form["mensaje"].strip()
+    mensaje = request.form.get("mensaje", "").strip()
+    modo = normalize_mode(request.form.get("modo"))
+    lenguaje = normalize_language(request.form.get("lenguaje"))
 
     if not mensaje:
         return Response("", content_type="text/plain")
@@ -97,9 +122,15 @@ def chat():
         },
         {
             "role": "system",
+            "content": build_mode_context(modo, lenguaje),
+        },
+        {
+            "role": "system",
             "content": build_memory_context(recuerdos),
         },
     ] + build_chat_context(historial, MAX_HISTORY_MESSAGES)
+
+    model_options = get_model_options(modo)
 
     def generate_response():
         global historial
@@ -113,6 +144,8 @@ def chat():
             options={
                 "num_ctx": OLLAMA_CONTEXT_SIZE,
                 "num_predict": MAX_RESPONSE_TOKENS,
+                "temperature": model_options["temperature"],
+                "top_p": model_options["top_p"],
             },
             keep_alive=OLLAMA_KEEP_ALIVE,
             stream=True,
@@ -137,7 +170,7 @@ def chat():
 
         if SHOW_RESPONSE_TIMES:
             elapsed = perf_counter() - start_time
-            print(f"Ollama response time: {elapsed:.2f}s")
+            print(f"Ollama response time ({modo}): {elapsed:.2f}s")
 
     return Response(generate_response(), content_type="text/plain")
 

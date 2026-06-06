@@ -3,40 +3,108 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IA Local con Memoria</title>
+    <title>{{ app_title }}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
 </head>
 <body>
-    <main class="chat-container">
-        <header class="chat-header">
-            <div>
+    <main class="app-shell">
+        <aside class="sidebar">
+            <div class="brand">
                 <p class="eyebrow">Ollama + Flask</p>
-                <h1>IA Local con memoria JSON</h1>
+                <h1>{{ app_title }}</h1>
+                <p class="subtitle">{{ app_subtitle }}</p>
             </div>
 
-            <button class="memory-button" type="button" onclick="mostrarMemoria()">
-                Ver memoria
-            </button>
-        </header>
+            <div class="model-badge" title="Modelo activo">
+                <span class="dot"></span>
+                <code>{{ model_name }}</code>
+            </div>
 
-        <section class="chat-box" id="chatBox" aria-live="polite">
-            <div class="message ai-message">Hola. Soy tu IA local. Estoy lista para ayudarte. Escribe "Que recuerdas de mi?" para ver mi memoria.</div>
+            <section class="panel">
+                <h2>Modo de trabajo</h2>
+                <div class="mode-list" id="modeList" role="tablist" aria-label="Modos de programacion"></div>
+            </section>
+
+            <section class="panel">
+                <h2>Lenguaje</h2>
+                <select id="languageSelect" aria-label="Lenguaje preferido">
+                    <option value="auto">Auto detectar</option>
+                    <option value="python">Python</option>
+                    <option value="javascript">JavaScript</option>
+                    <option value="typescript">TypeScript</option>
+                    <option value="html">HTML</option>
+                    <option value="css">CSS</option>
+                    <option value="java">Java</option>
+                    <option value="csharp">C#</option>
+                    <option value="cpp">C++</option>
+                    <option value="sql">SQL</option>
+                    <option value="bash">Bash</option>
+                    <option value="php">PHP</option>
+                    <option value="go">Go</option>
+                    <option value="rust">Rust</option>
+                </select>
+            </section>
+
+            <section class="panel">
+                <h2>Acciones</h2>
+                <div class="action-buttons">
+                    <button class="secondary-button" type="button" onclick="mostrarMemoria()">Ver memoria</button>
+                    <button class="secondary-button danger" type="button" onclick="limpiarChat()">Limpiar chat</button>
+                </div>
+            </section>
+
+            <section class="panel shortcuts">
+                <h2>Atajos</h2>
+                <ul>
+                    <li><kbd>Ctrl</kbd> + <kbd>Enter</kbd> Enviar</li>
+                    <li><kbd>Ctrl</kbd> + <kbd>K</kbd> Limpiar chat</li>
+                    <li><kbd>Shift</kbd> + <kbd>Enter</kbd> Nueva linea</li>
+                </ul>
+            </section>
+        </aside>
+
+        <section class="workspace">
+            <header class="workspace-header">
+                <div>
+                    <p class="workspace-eyebrow">Editor de prompts</p>
+                    <h2 id="activeModeLabel">Programar</h2>
+                    <p id="activeModeDescription" class="workspace-description">Genera codigo limpio y funcional</p>
+                </div>
+                <div class="status-pill" id="statusPill">Listo</div>
+            </header>
+
+            <section class="quick-prompts" id="quickPrompts" aria-label="Prompts rapidos"></section>
+
+            <section class="chat-box" id="chatBox" aria-live="polite">
+                <div class="message ai-message welcome-message">
+                    <p>Hola. Soy tu asistente local de programacion.</p>
+                    <p>Elige un modo, pega codigo entre <code>```</code> y dime que necesitas: crear, depurar, explicar, refactorizar o revisar.</p>
+                </div>
+            </section>
+
+            <form class="composer" onsubmit="enviarMensaje(); return false;">
+                <div class="composer-toolbar">
+                    <span id="composerMode">Modo: Programar</span>
+                    <span id="composerLanguage">Lenguaje: Auto</span>
+                </div>
+
+                <textarea
+                    id="mensaje"
+                    rows="4"
+                    placeholder="Describe lo que quieres programar o pega tu codigo aqui..."
+                    aria-label="Mensaje"
+                ></textarea>
+
+                <div class="composer-actions">
+                    <button class="ghost-button" type="button" onclick="insertarPlantillaCodigo()">Insertar bloque ```</button>
+                    <button class="primary-button" type="submit" id="sendButton">Enviar</button>
+                </div>
+            </form>
         </section>
-
-        <form class="chat-input" onsubmit="enviarMensaje(); return false;">
-            <textarea
-                id="mensaje"
-                rows="1"
-                placeholder="Escribe un mensaje..."
-                aria-label="Mensaje"
-            ></textarea>
-
-            <button type="submit">
-                Enviar
-            </button>
-        </form>
     </main>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
