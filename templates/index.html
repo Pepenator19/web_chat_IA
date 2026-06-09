@@ -10,64 +10,106 @@
 <body>
     <main class="app-shell">
         <aside class="sidebar">
-            <div class="brand">
-                <p class="eyebrow">Ollama + Flask</p>
-                <h1>{{ app_title }}</h1>
-                <p class="subtitle">{{ app_subtitle }}</p>
-            </div>
-
-            <div class="model-badge" title="Modelo activo">
-                <span class="dot"></span>
-                <code>{{ model_name }}</code>
-            </div>
-
-            <section class="panel">
-                <h2>Modo de trabajo</h2>
-                <div class="mode-list" id="modeList" role="tablist" aria-label="Modos de programacion"></div>
-            </section>
-
-            <section class="panel">
-                <h2>Lenguaje</h2>
-                <select id="languageSelect" aria-label="Lenguaje preferido">
-                    <option value="auto">Auto detectar</option>
-                    <option value="python">Python</option>
-                    <option value="javascript">JavaScript</option>
-                    <option value="typescript">TypeScript</option>
-                    <option value="html">HTML</option>
-                    <option value="css">CSS</option>
-                    <option value="java">Java</option>
-                    <option value="csharp">C#</option>
-                    <option value="cpp">C++</option>
-                    <option value="sql">SQL</option>
-                    <option value="bash">Bash</option>
-                    <option value="php">PHP</option>
-                    <option value="go">Go</option>
-                    <option value="rust">Rust</option>
-                </select>
-            </section>
-
-            <section class="panel">
-                <h2>Acciones</h2>
-                <div class="action-buttons">
-                    <button class="secondary-button" type="button" onclick="mostrarMemoria()">Ver memoria</button>
-                    <button class="secondary-button danger" type="button" onclick="limpiarChat()">Limpiar chat</button>
+            <div class="sidebar-top">
+                <div class="brand">
+                    <p class="eyebrow">Ollama + Flask</p>
+                    <h1>{{ app_title }}</h1>
+                    <p class="subtitle">{{ app_subtitle }}</p>
                 </div>
-            </section>
 
-            <section class="panel shortcuts">
-                <h2>Atajos</h2>
-                <ul>
-                    <li><kbd>Ctrl</kbd> + <kbd>Enter</kbd> Enviar</li>
-                    <li><kbd>Ctrl</kbd> + <kbd>K</kbd> Limpiar chat</li>
-                    <li><kbd>Shift</kbd> + <kbd>Enter</kbd> Nueva linea</li>
-                </ul>
-            </section>
+                <div class="model-badge" title="Modelo activo">
+                    <span class="dot"></span>
+                    <code>{{ model_name }}</code>
+                </div>
+            </div>
+
+            <div class="sidebar-body">
+                <details class="panel-collapsible" id="themeCollapsible">
+                    <summary>Personalizacion de colores</summary>
+                    <div class="panel-collapsible-content">
+                        <div class="theme-swatches" id="themeSwatches" role="group" aria-label="Temas de color"></div>
+                        <div class="color-customizers">
+                            <label class="color-picker-row">
+                                <span>Color principal</span>
+                                <input type="color" id="accentColorPicker" value="#3b82f6" aria-label="Color principal">
+                            </label>
+                            <label class="color-picker-row">
+                                <span>Color secundario</span>
+                                <input type="color" id="accent2ColorPicker" value="#22c55e" aria-label="Color secundario">
+                            </label>
+                            <label class="color-picker-row">
+                                <span>Fondo</span>
+                                <input type="color" id="bgColorPicker" value="#0b1020" aria-label="Color de fondo">
+                            </label>
+                        </div>
+                        <button class="secondary-button theme-reset-button" type="button" id="resetThemeButton">Restaurar tema</button>
+                    </div>
+                </details>
+
+                <section class="panel modes-panel">
+                    <h2>Modo de trabajo</h2>
+                    <div class="modes-scroll" id="modesScroll">
+                        <div class="agent-pro-slot" id="agentProSlot"></div>
+                        <div class="mode-list" id="modeList" role="tablist" aria-label="Modos de trabajo"></div>
+                    </div>
+                </section>
+
+                <section class="panel workspace-panel" id="workspacePanel">
+                    <h2>Carpeta del agente</h2>
+                    <input
+                        type="text"
+                        id="workspaceInput"
+                        value="{{ default_workspace }}"
+                        placeholder="Ruta absoluta del proyecto"
+                        aria-label="Carpeta de trabajo del agente"
+                    >
+                    <p class="panel-hint">Solo se usa en modo Agente. El agente puede leer, editar y ejecutar comandos aqui.</p>
+                </section>
+
+                <section class="panel language-panel" id="languagePanel">
+                    <h2>Lenguaje</h2>
+                    <select id="languageSelect" aria-label="Lenguaje preferido">
+                        <option value="auto">Auto detectar</option>
+                        <option value="python">Python</option>
+                        <option value="javascript">JavaScript</option>
+                        <option value="typescript">TypeScript</option>
+                        <option value="html">HTML</option>
+                        <option value="css">CSS</option>
+                        <option value="java">Java</option>
+                        <option value="csharp">C#</option>
+                        <option value="cpp">C++</option>
+                        <option value="sql">SQL</option>
+                        <option value="bash">Bash</option>
+                        <option value="php">PHP</option>
+                        <option value="go">Go</option>
+                        <option value="rust">Rust</option>
+                    </select>
+                </section>
+
+                <section class="panel">
+                    <h2>Acciones</h2>
+                    <div class="action-buttons">
+                        <button class="secondary-button" type="button" onclick="mostrarAyudaGlobal()">Ayuda global</button>
+                        <button class="secondary-button" type="button" onclick="mostrarMemoria()">Ver memoria</button>
+                        <button class="secondary-button danger" type="button" onclick="limpiarChat()">Limpiar chat</button>
+                    </div>
+                </section>
+
+                <section class="panel shortcuts">
+                    <h2>Atajos</h2>
+                    <ul>
+                        <li><kbd>Ctrl</kbd> + <kbd>Enter</kbd> Enviar</li>
+                        <li><kbd>Ctrl</kbd> + <kbd>K</kbd> Limpiar chat</li>
+                        <li><kbd>Shift</kbd> + <kbd>Enter</kbd> Nueva linea</li>
+                    </ul>
+                </section>
+            </div>
         </aside>
 
-        <section class="workspace">
-            <header class="workspace-header">
+        <section class="workspace" id="workspaceArea">
+            <header class="workspace-header" id="workspaceHeader">
                 <div>
-                    <p class="workspace-eyebrow">Editor de prompts</p>
+                    <p class="workspace-eyebrow" id="workspaceEyebrow">Asistente local</p>
                     <h2 id="activeModeLabel">Programar</h2>
                     <p id="activeModeDescription" class="workspace-description">Genera codigo limpio y funcional</p>
                 </div>
@@ -78,8 +120,8 @@
 
             <section class="chat-box" id="chatBox" aria-live="polite">
                 <div class="message ai-message welcome-message">
-                    <p>Hola. Soy tu asistente local de programacion.</p>
-                    <p>Elige un modo, pega codigo entre <code>```</code> y dime que necesitas: crear, depurar, explicar, refactorizar o revisar.</p>
+                    <p>Hola. Soy tu asistente local con chat, programacion y <strong>modo agente autonomo</strong>.</p>
+                    <p>En modo <strong>Agente</strong> puedo leer archivos, editarlos y ejecutar comandos en tu PC. Tambien tengo modos de <strong>Charla</strong> y <strong>Ayuda</strong>.</p>
                 </div>
             </section>
 
@@ -87,6 +129,7 @@
                 <div class="composer-toolbar">
                     <span id="composerMode">Modo: Programar</span>
                     <span id="composerLanguage">Lenguaje: Auto</span>
+                    <span id="composerWorkspace" class="hidden">Carpeta: -</span>
                 </div>
 
                 <textarea
@@ -97,8 +140,10 @@
                 ></textarea>
 
                 <div class="composer-actions">
-                    <button class="ghost-button" type="button" onclick="insertarPlantillaCodigo()">Insertar bloque ```</button>
-                    <button class="primary-button" type="submit" id="sendButton">Enviar</button>
+                    <button class="ghost-button" type="button" id="insertCodeButton" onclick="insertarPlantillaCodigo()">Insertar bloque ```</button>
+                    <button class="primary-button" type="submit" id="sendButton">
+                        <span id="sendButtonLabel">Enviar</span>
+                    </button>
                 </div>
             </form>
         </section>

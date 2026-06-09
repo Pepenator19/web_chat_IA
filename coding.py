@@ -1,7 +1,86 @@
+HELP_CONTENT = """# Ayuda global de Code IA Local
+
+## Que es esta app
+Asistente local con Flask + Ollama. Todo corre en tu PC: chat, programacion y agente autonomo.
+
+## Modos disponibles
+
+### Agente (autonomo)
+Ejecuta acciones reales en tu carpeta de trabajo:
+- Leer, escribir y editar archivos
+- Buscar en el proyecto (Grep, Glob)
+- Ejecutar comandos de terminal (Shell)
+Configura la **carpeta de trabajo** en el panel lateral antes de usarlo.
+
+### Programar
+Genera codigo limpio y funcional.
+
+### Debug
+Analiza errores y propone correcciones.
+
+### Explicar
+Explica codigo o conceptos con claridad.
+
+### Refactor
+Mejora estructura y legibilidad sin cambiar comportamiento.
+
+### Revisar
+Code review con severidad: critico, advertencia, sugerencia.
+
+### Charla
+Conversacion libre sin enfocarse solo en codigo.
+
+### Ayuda
+Responde dudas sobre como usar la app, modos, atajos y memoria.
+
+## Atajos
+- Ctrl + Enter: enviar mensaje
+- Ctrl + K: limpiar chat
+- Shift + Enter: nueva linea en el textarea
+
+## Memoria
+- Historial del chat: data/memoria.json
+- Recuerdos del usuario: data/recuerdos.json
+- Comando: "Que recuerdas de mi?"
+- Boton: Ver memoria
+
+## Endpoints API
+- POST /chat — enviar mensaje (modo, lenguaje, workspace)
+- GET /modes — listar modos
+- GET /help — ayuda global
+- GET /memories — ver recuerdos
+- POST /clear — limpiar chat
+
+## Variables de entorno
+- OLLAMA_MODEL — cambiar modelo
+- AGENT_WORKSPACE — carpeta por defecto del agente
+
+## Requisitos
+Python 3.10+, Ollama corriendo, modelo instalado (ej: qwen2.5-coder:7b)
+"""
+
 CODING_MODES = {
+    "agente": {
+        "label": "Agente",
+        "description": "Autonomo: lee, edita y ejecuta en tu PC",
+        "group": "principal",
+        "uses_language": False,
+        "uses_workspace": True,
+        "stream_type": "agent",
+        "prompt": (
+            "Modo AGENTE activo.\n"
+            "Tienes herramientas reales para actuar en la carpeta de trabajo del usuario.\n"
+            "No des instrucciones manuales: ejecuta tu mismo con las herramientas.\n"
+            "Investiga, actua, verifica y resume lo hecho."
+        ),
+    },
     "programar": {
         "label": "Programar",
         "description": "Genera codigo limpio y funcional",
+        "group": "codigo",
+        "uses_language": True,
+        "uses_workspace": False,
+        "stream_type": "text",
         "prompt": (
             "Modo PROGRAMAR activo.\n"
             "El usuario quiere codigo util y ejecutable.\n"
@@ -13,6 +92,10 @@ CODING_MODES = {
     "debug": {
         "label": "Debug",
         "description": "Encuentra y corrige errores",
+        "group": "codigo",
+        "uses_language": True,
+        "uses_workspace": False,
+        "stream_type": "text",
         "prompt": (
             "Modo DEBUG activo.\n"
             "Analiza el codigo o error del usuario paso a paso.\n"
@@ -23,6 +106,10 @@ CODING_MODES = {
     "explicar": {
         "label": "Explicar",
         "description": "Explica codigo o conceptos",
+        "group": "codigo",
+        "uses_language": True,
+        "uses_workspace": False,
+        "stream_type": "text",
         "prompt": (
             "Modo EXPLICAR activo.\n"
             "Explica con claridad, sin asumir que el usuario es experto.\n"
@@ -33,6 +120,10 @@ CODING_MODES = {
     "refactor": {
         "label": "Refactor",
         "description": "Mejora estructura y legibilidad",
+        "group": "codigo",
+        "uses_language": True,
+        "uses_workspace": False,
+        "stream_type": "text",
         "prompt": (
             "Modo REFACTOR activo.\n"
             "Mejora legibilidad, nombres, estructura y mantenibilidad.\n"
@@ -43,11 +134,44 @@ CODING_MODES = {
     "revisar": {
         "label": "Revisar",
         "description": "Revision de codigo tipo code review",
+        "group": "codigo",
+        "uses_language": True,
+        "uses_workspace": False,
+        "stream_type": "text",
         "prompt": (
             "Modo REVISAR activo.\n"
             "Haz una revision tipo code review.\n"
             "Marca problemas por severidad: critico, advertencia, sugerencia.\n"
             "Sugiere mejoras concretas y justificadas."
+        ),
+    },
+    "charla": {
+        "label": "Charla",
+        "description": "Conversacion libre y natural",
+        "group": "general",
+        "uses_language": False,
+        "uses_workspace": False,
+        "stream_type": "text",
+        "prompt": (
+            "Modo CHARLA activo.\n"
+            "Conversa de forma natural, amigable y util.\n"
+            "No estas limitada solo a programacion: puedes hablar de cualquier tema.\n"
+            "Se breve y calida. Si el usuario pide codigo, ayudale, pero no fuerces temas tecnicos."
+        ),
+    },
+    "ayuda": {
+        "label": "Ayuda",
+        "description": "Guia de uso de la aplicacion",
+        "group": "general",
+        "uses_language": False,
+        "uses_workspace": False,
+        "stream_type": "text",
+        "prompt": (
+            "Modo AYUDA activo.\n"
+            "Respondes preguntas sobre como usar Code IA Local.\n"
+            "Explica modos, atajos, memoria, agente autonomo, requisitos y endpoints.\n"
+            "Se clara, estructurada y practica. Usa listas cuando ayude.\n"
+            "Si no sabes algo concreto del entorno del usuario, dilo sin inventar."
         ),
     },
 }
@@ -72,6 +196,12 @@ LANGUAGE_HINTS = {
 }
 
 QUICK_PROMPTS = {
+    "agente": [
+        "Lista los archivos del proyecto y resume la estructura",
+        "Lee app.py y explicame que hace",
+        "Crea un archivo test_agent.py con un hello world",
+        "Busca todos los archivos .py y dime cuantos hay",
+    ],
     "programar": [
         "Crea una funcion que ",
         "Haz un script en Python que ",
@@ -98,6 +228,18 @@ QUICK_PROMPTS = {
         "Que problemas de seguridad ves aqui?",
         "Que mejoras harías antes de produccion?",
     ],
+    "charla": [
+        "Como estas hoy?",
+        "Cuentame algo interesante",
+        "Que puedes hacer ademas de programar?",
+        "Recomiendame algo para aprender esta semana",
+    ],
+    "ayuda": [
+        "Que modos tiene la app?",
+        "Como funciona el modo agente?",
+        "Que atajos de teclado hay?",
+        "Como funciona la memoria local?",
+    ],
 }
 
 
@@ -113,8 +255,24 @@ def get_mode_info(mode):
         "id": mode_id,
         "label": data["label"],
         "description": data["description"],
+        "group": data.get("group", "codigo"),
+        "uses_language": data.get("uses_language", True),
+        "uses_workspace": data.get("uses_workspace", False),
+        "stream_type": data.get("stream_type", "text"),
         "quick_prompts": QUICK_PROMPTS.get(mode_id, []),
     }
+
+
+def get_help_content():
+    return HELP_CONTENT
+
+
+def is_agent_mode(mode):
+    return normalize_mode(mode) == "agente"
+
+
+def get_mode_stream_type(mode):
+    return CODING_MODES[normalize_mode(mode)].get("stream_type", "text")
 
 
 def list_modes():
@@ -142,6 +300,9 @@ def build_mode_context(mode, language):
 def get_model_options(mode):
     mode_id = normalize_mode(mode)
 
+    if mode_id == "agente":
+        return {"temperature": 0.2, "top_p": 0.9}
+
     if mode_id in {"programar", "refactor"}:
         return {"temperature": 0.2, "top_p": 0.9}
 
@@ -151,4 +312,14 @@ def get_model_options(mode):
     if mode_id == "revisar":
         return {"temperature": 0.15, "top_p": 0.9}
 
+    if mode_id == "charla":
+        return {"temperature": 0.75, "top_p": 0.95}
+
+    if mode_id == "ayuda":
+        return {"temperature": 0.25, "top_p": 0.9}
+
     return {"temperature": 0.35, "top_p": 0.95}
+
+
+def build_help_context():
+    return f"Documentacion interna de la app:\n\n{HELP_CONTENT}"

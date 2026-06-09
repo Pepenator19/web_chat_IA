@@ -38,15 +38,23 @@ MEMORY_QUESTIONS = [
 ]
 
 QUICK_REPLIES = {
-    "hola": "Hola. Estoy lista para programar, depurar o revisar codigo contigo.",
-    "buenos dias": "Buenos dias. Elige un modo arriba y dime que codigo construimos hoy.",
-    "buen dia": "Buen dia. Que bug cazamos o que feature armamos?",
-    "buenas": "Buenas. Tu IDE local favorita ya esta despierta.",
+    "hola": "Hola. Puedo charlar, programar o actuar como agente autonomo en tu carpeta de trabajo.",
+    "buenos dias": "Buenos dias. Elige un modo: Agente, Programar, Charla o Ayuda.",
+    "buen dia": "Buen dia. Que hacemos hoy: codigo, charla o mando yo las herramientas?",
+    "buenas": "Buenas. Tu asistente local ya esta despierta.",
     "gracias": "De nada. Otro commit salvado de la humanidad.",
     "ayuda": (
-        "Puedo ayudarte a programar, depurar, explicar, refactorizar y revisar codigo.\n"
-        "Usa los modos de arriba, pega bloques de codigo entre ``` y elige un lenguaje si quieres.\n"
-        "Atajos utiles: Ctrl+Enter enviar, Ctrl+K limpiar chat."
+        "Modos disponibles:\n"
+        "- Agente: ejecuta acciones reales (archivos, terminal)\n"
+        "- Programar / Debug / Explicar / Refactor / Revisar\n"
+        "- Charla: conversacion libre\n"
+        "- Ayuda: guia de la app\n\n"
+        "Atajos: Ctrl+Enter enviar, Ctrl+K limpiar chat.\n"
+        "Pulsa el boton 'Ayuda global' en el panel lateral para la guia completa."
+    ),
+    "help": (
+        "Modos: Agente, Programar, Debug, Explicar, Refactor, Revisar, Charla, Ayuda.\n"
+        "Usa el boton 'Ayuda global' o el modo Ayuda para mas detalle."
     ),
 }
 
