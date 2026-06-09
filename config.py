@@ -9,7 +9,7 @@ PERSONALITY_FILE = os.path.join(PROMPTS_DIR, "personalidad.txt")
 CHAT_MEMORY_FILE = os.path.join(DATA_DIR, "memoria.json")
 USER_MEMORIES_FILE = os.path.join(DATA_DIR, "recuerdos.json")
 
-OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "qwen2.5-coder:3b-instruct")
+OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "qwen2.5-coder:7b ")
 
 MAX_HISTORY_MESSAGES = 8
 MAX_MESSAGE_CHARS = 2500
